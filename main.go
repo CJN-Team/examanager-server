@@ -1,9 +1,10 @@
 package main
 
 import (
-	"server/database"
-	"server/handlers"
 	"log"
+
+	"github.com/CJN-Team/examanager-server/database"
+	"github.com/CJN-Team/examanager-server/handlers"
 )
 
 func main() {
