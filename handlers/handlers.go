@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/CJN-Team/examanager-server/middleware"
+	"github.com/CJN-Team/examanager-server/routers"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 )
@@ -12,6 +14,8 @@ import (
 //Manejadores setea al handler y pone a escuchar al servidor
 func Manejadores() {
 	router := mux.NewRouter()
+
+	router.HandleFunc("/user", middleware.DatabaseVerify(routers.CreateUser)).Methods("POST")
 
 	PORT := os.Getenv("PORT")
 
