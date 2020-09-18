@@ -16,4 +16,5 @@ type User struct {
 	Email     string             `bson:"email,omitempty" json: "email"`
 	BirthDate time.Time          `bson:"birthDate,omitempty" json: "birthDate,omitempty"`
 	Photo     string             `bson:"photo,omitempty" json: "photo,omitempty"`
+	Password  string			 `bson:"password,omitempty" json: "password,omitempty"`
 }

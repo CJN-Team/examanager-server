@@ -38,7 +38,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, found, _ := database.UserExist(t.Email)
+	_, found, _ := database.GetUserByEmail(t.Email)
 
 	if found {
 		http.Error(w, "El usuario ya existe", 400)
@@ -59,3 +59,26 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 }
+
+/*
+//ReadUser funcion para la lectura de un usuario presente en la base de datos
+func ReadUser(w http.ResponseWriter, r *http.Request) {
+
+	var user models.User
+
+	error := json.NewDecoder(r.Body).Decode(&user)
+
+	if error != nil {
+		http.Error(w, "Error en los datos recibidos "+error.Error(), 400)
+		return
+	}
+
+	user, found, _ := database.GetUserByID(user.ID)
+
+	if error != nil {
+		http.Error(w, "El usuario no existe", 400)
+		return
+	}
+
+}
+*/
