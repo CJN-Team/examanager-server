@@ -60,25 +60,53 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-/*
 //ReadUser funcion para la lectura de un usuario presente en la base de datos
 func ReadUser(w http.ResponseWriter, r *http.Request) {
+
+	ID := r.URL.Query().Get("id")
+
+	if len(ID) < 1 {
+		http.Error(w, "Falta el parametro ID", http.StatusBadRequest)
+		return
+	}
+
+	user, error := database.GetUserByID(ID)
+
+	if error != nil {
+		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
+		return
+	}
+
+	w.Header().Set("context-type", "application/json")
+
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(user)
+}
+
+//UpdateUser se encarga de la actualizacion del usuario seleccionado
+func UpdateUser(w http.ResponseWriter, r *http.Request){
 
 	var user models.User
 
 	error := json.NewDecoder(r.Body).Decode(&user)
 
-	if error != nil {
-		http.Error(w, "Error en los datos recibidos "+error.Error(), 400)
+	if error != nil{
+		http.Error(w, "Datos Incorrectos"+error.Error(),400)
 		return
 	}
 
-	user, found, _ := database.GetUserByID(user.ID)
+	status,error := database.UpdateUser(user,IDUser)
 
-	if error != nil {
-		http.Error(w, "El usuario no existe", 400)
+	if error != nil{
+		http.Error(w,"Ocurrio un error al intentar modificar el registro"+error.Error(),400)
 		return
 	}
 
+	if status == false {
+		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
 }
-*/
