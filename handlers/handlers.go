@@ -19,6 +19,8 @@ func Manejadores() {
 	router.HandleFunc("/login", middleware.DatabaseVerify(routers.Login)).Methods("POST")
 	router.HandleFunc("/profile", middleware.DatabaseVerify(middleware.ValidationJWT(routers.ReadUser))).Methods("GET")
 	router.HandleFunc("/UpdateUser", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateUser))).Methods("PUT")
+	router.HandleFunc("/Users", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllUsersRouter))).Methods("GET")
+
 
 	PORT := os.Getenv("PORT")
 

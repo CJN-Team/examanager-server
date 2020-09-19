@@ -3,6 +3,7 @@ package routers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/CJN-Team/examanager-server/database"
 	"github.com/CJN-Team/examanager-server/models"
@@ -109,4 +110,41 @@ func UpdateUser(w http.ResponseWriter, r *http.Request){
 	}
 
 	w.WriteHeader(http.StatusCreated)
+}
+//GetAllUsersRouter permite tomar todos los usuarios de una categoria
+func GetAllUsersRouter(w http.ResponseWriter, r *http.Request){
+
+	profile:= r.URL.Query().Get("profile")
+
+	if len(profile)<1{
+		http.Error(w,"Debe enviar el perfil a buscar",http.StatusBadRequest)
+		return
+	}
+
+	if len(r.URL.Query().Get("page"))<1{
+		http.Error(w,"Debe enviar el parametro pagina",http.StatusBadRequest)
+		return
+	}
+
+	page, error := strconv.Atoi(r.URL.Query().Get("page"))
+
+	if error != nil {
+		http.Error(w, "Pagina debe ser mayor a 0",http.StatusBadRequest)
+		return
+	}
+
+	pageAux := int64(page)
+
+	result, correct := database.GetAllUsers(profile,pageAux)
+
+	if correct == false{
+		http.Error(w,"Error al leer los usuarios",http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-type","application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(result)
+
 }
