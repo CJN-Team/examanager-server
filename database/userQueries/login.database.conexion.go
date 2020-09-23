@@ -1,4 +1,4 @@
-package database
+package userQueries
 
 import (
 	"github.com/CJN-Team/examanager-server/models"

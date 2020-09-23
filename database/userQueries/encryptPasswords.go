@@ -1,4 +1,4 @@
-package database
+package userQueries
 
 import "golang.org/x/crypto/bcrypt"
 

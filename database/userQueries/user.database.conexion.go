@@ -1,4 +1,4 @@
-package database
+package userQueries
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/CJN-Team/examanager-server/models"
+	dbConnection "github.com/CJN-Team/examanager-server/database"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -17,7 +18,7 @@ func GetUserByEmail(email string) (models.User, bool, string) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	database := MongoConexion.Database("examanager_db")
+	database := dbConnection.MongoConexion.Database("examanager_db")
 
 	coleccion := database.Collection("users")
 
@@ -42,7 +43,7 @@ func AddUser(u models.User) (string, bool, error) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	database := MongoConexion.Database("examanager_db")
+	database := dbConnection.MongoConexion.Database("examanager_db")
 
 	coleccion := database.Collection("users")
 
@@ -65,7 +66,7 @@ func GetUserByID(ID string) (models.User, error) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	database := MongoConexion.Database("examanager_db")
+	database := dbConnection.MongoConexion.Database("examanager_db")
 
 	coleccion := database.Collection("users")
 
@@ -91,7 +92,7 @@ func GetAllUsers(category string, page int64) ([]*models.User, bool) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	database := MongoConexion.Database("examanager_db")
+	database := dbConnection.MongoConexion.Database("examanager_db")
 
 	coleccion := database.Collection("users")
 
@@ -131,7 +132,7 @@ func UpdateUser(user models.User, ID string) (bool, error) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	database := MongoConexion.Database("examanager_db")
+	database := dbConnection.MongoConexion.Database("examanager_db")
 
 	coleccion := database.Collection("users")
 
