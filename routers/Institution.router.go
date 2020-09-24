@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	database "github.com/CJN-Team/examanager-server/database/institutionqueries"
+	database "github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

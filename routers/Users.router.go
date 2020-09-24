@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	database "github.com/CJN-Team/examanager-server/database/userqueries"
+	database "github.com/CJN-Team/examanager-server/database/usersqueries"
 	"github.com/CJN-Team/examanager-server/models"
 )
 

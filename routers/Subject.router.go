@@ -3,7 +3,7 @@ package routers
 import (
 	"encoding/json"
 	"net/http"
-	database "github.com/CJN-Team/examanager-server/database/institutionqueries"
+	database "github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"fmt"
 	
