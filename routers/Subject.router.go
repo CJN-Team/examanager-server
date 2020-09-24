@@ -5,6 +5,7 @@ import (
 	"net/http"
 	database "github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
+	"fmt"
 )
 
 //CreateSubject permite crear una institucion nueva en la base de datos con el modelo de institucion
@@ -187,6 +188,9 @@ func UpdateSubjectName(subjectName string, subject interface{},
 //UpdateSubjectTopics permite 
 func UpdateSubjectTopics(subjectName string,SubjectInfo models.Subject, institutionInfo models.Institution)(string,bool,error){
 	delete(institutionInfo.Subjetcs, subjectName)
+	fmt.Println(subjectName)
+	fmt.Println(SubjectInfo)
+	fmt.Println(institutionInfo)
 	institutionInfo.Subjetcs[SubjectInfo.Name] = SubjectInfo.Topics
 	status, err := database.DeleteSubject(institutionInfo, subjectName)
 	if err != nil{
