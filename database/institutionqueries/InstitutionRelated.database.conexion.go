@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-//AddSubject le permite a un administrador de una institucion creado una asignatura
+//AddSubject le permite a un administrador de una institucion crear una asignatura
 func AddSubject(institutionInfo models.Institution, SubjectInfo models.Subject)(bool,error){
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
@@ -36,6 +36,31 @@ func AddSubject(institutionInfo models.Institution, SubjectInfo models.Subject)(
 
 }
 
+//DeleteSubject elimina una asignatura de una institucion
+func DeleteSubject(institutionInfo models.Institution, SubjectName string)(bool,error){
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	db := dbConnection.MongoConexion.Database("examanager_db")
+	col := db.Collection("Institutions")
+	delete(institutionInfo.Subjetcs, SubjectName)
+
+	updateString := bson.M{
+		"$set": institutionInfo,
+	}
+
+	id, _ := primitive.ObjectIDFromHex(institutionInfo.ID.Hex())
+	filter := bson.M{"_id": bson.M{"$eq": id}}
+
+	_, err := col.UpdateOne(ctx, filter, updateString)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+
+}
 
 //AddUsersXInstitution crea un documento que relacionara la institucion que se esta creando con los diferentes usuarios de esta.
 func AddUsersXInstitution(name string)(string,bool,error){

@@ -9,10 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-/*
-	InstitutionRegistration permite crear una institucion nueva en la base de datos con el modelo de institucion,
-	verificando solamente los datos principales de la institución para poder crearla.
-*/
+//InstitutionRegistration permite crear una institucion nueva en la base de datos con el modelo de institucion
 func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 	var InstitutionInfo models.Institution
 	err := json.NewDecoder(r.Body).Decode(&InstitutionInfo)
