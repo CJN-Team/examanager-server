@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	database "github.com/CJN-Team/examanager-server/database/userqueries"
+	database "github.com/CJN-Team/examanager-server/database/institutionqueries"
 	"github.com/CJN-Team/examanager-server/models"
 )
 
@@ -16,7 +16,7 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 	var InstitutionInfo models.Institution
 	err := json.NewDecoder(r.Body).Decode(&InstitutionInfo)
 	if err != nil {
-		http.Error(w, "Error en los datos recibidos"+err.Error(), 400)
+		http.Error(w, "Error en los datos recibidos "+err.Error(), 400)
 		return
 	}
 	if len(InstitutionInfo.Name) < 0 {
@@ -36,7 +36,7 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, found, _ := database.GetInstitution(InstitutionInfo.Name)
+	_, found, _ := database.GetInstitutionByName(InstitutionInfo.Name)
 	if found {
 		http.Error(w, "Ya existe una institución con ese nombre", 400)
 		return
@@ -56,7 +56,8 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 
 	InstitutionInfo.Users = UsersXInstitutionID
 	InstitutionInfo.Questions = QuestionsXInstitutionID
-
+	aux := [...]string{"sadas","fdfdfas"}
+	InstitutionInfo.Subjetcs = aux
 	_, status, err = database.AddInstitution(InstitutionInfo)
 	if err != nil {
 		http.Error(w, "Ha ocurrido un error al intentar realizar el registro de institucion "+err.Error(), 400)

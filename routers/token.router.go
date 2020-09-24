@@ -15,15 +15,18 @@ var Email string
 
 //IDUser es el id del usuario obtenido del modelo
 var IDUser string
-
+//Profile es el rol de usuario obtenido del modelo
+var Profile string
+//InstitutionID es el ID de referencia de la Institucion a la que pertenece el usuario
+var InstitutionID string 
 //GetToken permite extraer los valores que contiene el token
-func GetToken(token string) (*models.Claim,bool,string, error){
+func GetToken(token string) (*models.Claim,bool,string, string, string,error){
 	password := []byte ("YouShallNotPasssssss")
 	claims := &models.Claim {}
 
 	splitToken := strings.Split(token,"Bearer")
 	if len(splitToken) != 2 {
-		return claims,false, string(""),errors.New("formato de token invalido")
+		return claims,false, string(""),string(""),string(""),errors.New("formato de token invalido")
 	}
 
 	token = strings.TrimSpace(splitToken[1])
@@ -37,11 +40,13 @@ func GetToken(token string) (*models.Claim,bool,string, error){
 		if found == true {
 			Email = claims.Email
 			IDUser = claims.ID.Hex()
+			Profile = claims.Profile
+			InstitutionID = claims.Institution
 		}
-		return claims,found,IDUser,nil
+		return claims,found,IDUser, Profile, InstitutionID,nil
 	}
 	if !tokens.Valid{
-		return claims,false,string(""),errors.New("token invalido")
+		return claims,false,string(""),string(""),string(""),errors.New("token invalido")
 	}
-	return claims, false, string(""),error
+	return claims, false, string(""),string(""),string(""),error
 }

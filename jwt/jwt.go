@@ -8,19 +8,20 @@ import (
 )
 
 //GenerateJWT Genera el Json web token que utilizara al momento de enviar los datos
-func GenerateJWT(user models.User) (string ,error) {
+func GenerateJWT(user models.User) (string, error) {
 
-password:=[]byte("YouShallNotPasssssss")
+	password := []byte("YouShallNotPasssssss")
 
 	payload := jwt.MapClaims{
-		"email":      user.Email,
-		"profile":    user.Profile,
-		"idType":     user.IDType,
-		"name":       user.Name,
-		"lastName":   user.LastName,
-		"birthDate":  user.Email,
-		"_id":        user.ID.Hex(),
-		"expiration": time.Now().Add(time.Hour * 24).Unix(),
+		"email":       user.Email,
+		"profile":     user.Profile,
+		"idType":      user.IDType,
+		"name":        user.Name,
+		"lastName":    user.LastName,
+		"birthDate":   user.Email,
+		"_id":         user.ID.Hex(),
+		"expiration":  time.Now().Add(time.Hour * 24).Unix(),
+		"institution": user.Institution,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
