@@ -42,7 +42,7 @@ func CreateSubject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "La institucion no existe", 400)
 		return
 	}	
-	status, err := database.AddSubject(SubjectInfo,institutionInfo)
+	status, err := database.AddSubject(institutionInfo,SubjectInfo)
 	if err != nil {
 		http.Error(w, "Ha ocurrido un error al intentar realizar el registro de institucion "+err.Error(), 400)
 		return

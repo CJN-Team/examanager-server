@@ -6,6 +6,7 @@ import (
 
 	database "github.com/CJN-Team/examanager-server/database/institutionqueries"
 	"github.com/CJN-Team/examanager-server/models"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 /*
@@ -56,7 +57,7 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 
 	InstitutionInfo.Users = UsersXInstitutionID
 	InstitutionInfo.Questions = QuestionsXInstitutionID
-	aux := [...]string{"sadas","fdfdfas"}
+	aux := primitive.M{}
 	InstitutionInfo.Subjetcs = aux
 	_, status, err = database.AddInstitution(InstitutionInfo)
 	if err != nil {

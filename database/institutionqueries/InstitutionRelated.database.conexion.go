@@ -8,10 +8,9 @@ import (
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"fmt"
 )
-
-func AddSubject(SubjectInfo models.Subject, institutionInfo models.Institution)(bool,error){
+//AddSubject le permite a un administrador de una institucion creado una asignatura
+func AddSubject(institutionInfo models.Institution, SubjectInfo models.Subject)(bool,error){
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -19,15 +18,14 @@ func AddSubject(SubjectInfo models.Subject, institutionInfo models.Institution)(
 	db := dbConnection.MongoConexion.Database("examanager_db")
 	col := db.Collection("Institutions")
 
-	fmt.Printf("%v \n",SubjectInfo)
-	fmt.Printf("%v \n",institutionInfo)
-	//institutionInfo.Subjetcs = append(institutionInfo.Subjetcs,SubjectInfo)
-	fmt.Printf("%v \n",institutionInfo.Subjetcs)
+	institutionInfo.Subjetcs[SubjectInfo.Name] = SubjectInfo.Topics
+
 	updateString := bson.M{
 		"$set": institutionInfo,
 	}
-	fmt.Printf("%v \n",updateString)
-	filter := bson.M{"_id": bson.M{"$eq": institutionInfo.ID.Hex()}}
+
+	id, _ := primitive.ObjectIDFromHex(institutionInfo.ID.Hex())
+	filter := bson.M{"_id": bson.M{"$eq": id}}
 
 	_, err := col.UpdateOne(ctx, filter, updateString)
 	if err != nil {
@@ -57,7 +55,7 @@ func AddUsersXInstitution(name string)(string,bool,error){
 	}
 
 	UsersXInstitutionID, _ := result.InsertedID.(primitive.ObjectID)
-	return UsersXInstitutionID.String(), true, nil
+	return UsersXInstitutionID.Hex(), true, nil
 
 }
 //AddQuestionsXInstitution crea un documento que relacionara la institucion que se esta creando con las preguntas de esta.
@@ -78,7 +76,7 @@ func AddQuestionsXInstitution(name string)(string,bool,error){
 	}
 
 	QuestionsXInstitutionID, _ := result.InsertedID.(primitive.ObjectID)
-	return QuestionsXInstitutionID.String(), true, nil
+	return QuestionsXInstitutionID.Hex(), true, nil
 
 }
 

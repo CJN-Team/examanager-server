@@ -12,6 +12,6 @@ type Institution struct {
 	Address   string             `bson:"address,omitempty" json:"address,omitempty"`
 	Phone     string             `bson:"phone,omitempty" json:"phone,omitempty"`
 	Users     string             `bson:"users,omitempty" json:"users,omitempty"`
-	Subjetcs  []string          `bson:"subjects,omitempty" json:"subjects,omitempty"`
+	Subjetcs  primitive.M        `bson:"subjects" json:"subjects"`
 	Questions string             `bson:"questions,omitempty" json:"questions,omitempty"`
 }
