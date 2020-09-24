@@ -5,13 +5,12 @@ import (
 	"net/http"
 	database "github.com/CJN-Team/examanager-server/database/institutionqueries"
 	"github.com/CJN-Team/examanager-server/models"
-	"fmt"
-	
+
 )
 
 //CreateSubject permite crear una institucion nueva en la base de datos con el modelo de institucion
 func CreateSubject(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("---------------")
+	
 	var SubjectInfo models.Subject
 	err := json.NewDecoder(r.Body).Decode(&SubjectInfo)
 	
@@ -50,19 +49,12 @@ func CreateSubject(w http.ResponseWriter, r *http.Request) {
 }
 //DeleteSubject le permite a un administrador de una institucion eliminar una asignatura
 func DeleteSubject(w http.ResponseWriter, r *http.Request) {
-
-	//var SubjectName string	
-	//err := json.NewDecoder(r.Body).Decode(&SubjectName)
-	//fmt.Println(SubjectName)
-	//bodyBytes, err := ioutil.ReadAll(r.Body)
-	/*if err != nil {
-		http.Error(w, "Error en los datos recibidos "+err.Error(), 400)
+	r.ParseForm()
+	SubjectName := r.Form.Get("name")	
+	if SubjectName == "" {
+		http.Error(w, "Error en los datos recibidos ", 400)
 		return
-	}*/
-
-	//reqBody := string(bodyBytes)
-	SubjectName := ""
-	fmt.Println(SubjectName)
+	}
 	if len(SubjectName) < 0 {
 		http.Error(w, "El nombre de la asignatura a eliminar es requerido", 400)
 		return
@@ -83,8 +75,9 @@ func DeleteSubject(w http.ResponseWriter, r *http.Request) {
 	}	
 
 	_,found = institutionInfo.Subjetcs[SubjectName]
-	if !found{
-		http.Error(w, "Esta asignatura no existe en la institución "+err.Error(), 406)
+
+	if !found {
+		http.Error(w, "Esta asignatura no existe en la institución ", 406)
 		return
 	}
 
