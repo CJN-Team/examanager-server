@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/CJN-Team/examanager-server/models"
-	database "github.com/CJN-Team/examanager-server/database/userQueries"
+	database "github.com/CJN-Team/examanager-server/database/userqueries"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 

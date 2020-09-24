@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	database "github.com/CJN-Team/examanager-server/database/userQueries"
+	database "github.com/CJN-Team/examanager-server/database/userqueries"
 	"github.com/CJN-Team/examanager-server/jwt"
 	"github.com/CJN-Team/examanager-server/models"
 )

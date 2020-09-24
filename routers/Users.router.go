@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	database "github.com/CJN-Team/examanager-server/database/userQueries"
+	database "github.com/CJN-Team/examanager-server/database/userqueries"
 	"github.com/CJN-Team/examanager-server/models"
 )
 
@@ -86,21 +86,21 @@ func ReadUser(w http.ResponseWriter, r *http.Request) {
 }
 
 //UpdateUser se encarga de la actualizacion del usuario seleccionado
-func UpdateUser(w http.ResponseWriter, r *http.Request){
+func UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	var user models.User
 
 	error := json.NewDecoder(r.Body).Decode(&user)
 
-	if error != nil{
-		http.Error(w, "Datos Incorrectos"+error.Error(),400)
+	if error != nil {
+		http.Error(w, "Datos Incorrectos"+error.Error(), 400)
 		return
 	}
 
-	status,error := database.UpdateUser(user,IDUser)
+	status, error := database.UpdateUser(user, IDUser)
 
-	if error != nil{
-		http.Error(w,"Ocurrio un error al intentar modificar el registro"+error.Error(),400)
+	if error != nil {
+		http.Error(w, "Ocurrio un error al intentar modificar el registro"+error.Error(), 400)
 		return
 	}
 
@@ -111,38 +111,39 @@ func UpdateUser(w http.ResponseWriter, r *http.Request){
 
 	w.WriteHeader(http.StatusCreated)
 }
+
 //GetAllUsersRouter permite tomar todos los usuarios de una categoria
-func GetAllUsersRouter(w http.ResponseWriter, r *http.Request){
+func GetAllUsersRouter(w http.ResponseWriter, r *http.Request) {
 
-	profile:= r.URL.Query().Get("profile")
+	profile := r.URL.Query().Get("profile")
 
-	if len(profile)<1{
-		http.Error(w,"Debe enviar el perfil a buscar",http.StatusBadRequest)
+	if len(profile) < 1 {
+		http.Error(w, "Debe enviar el perfil a buscar", http.StatusBadRequest)
 		return
 	}
 
-	if len(r.URL.Query().Get("page"))<1{
-		http.Error(w,"Debe enviar el parametro pagina",http.StatusBadRequest)
+	if len(r.URL.Query().Get("page")) < 1 {
+		http.Error(w, "Debe enviar el parametro pagina", http.StatusBadRequest)
 		return
 	}
 
 	page, error := strconv.Atoi(r.URL.Query().Get("page"))
 
 	if error != nil {
-		http.Error(w, "Pagina debe ser mayor a 0",http.StatusBadRequest)
+		http.Error(w, "Pagina debe ser mayor a 0", http.StatusBadRequest)
 		return
 	}
 
 	pageAux := int64(page)
 
-	result, correct := database.GetAllUsers(profile,pageAux)
+	result, correct := database.GetAllUsers(profile, pageAux)
 
-	if correct == false{
-		http.Error(w,"Error al leer los usuarios",http.StatusBadRequest)
+	if correct == false {
+		http.Error(w, "Error al leer los usuarios", http.StatusBadRequest)
 		return
 	}
 
-	w.Header().Set("Content-type","application/json")
+	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
 	json.NewEncoder(w).Encode(result)
