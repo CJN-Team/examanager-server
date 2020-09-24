@@ -1,4 +1,4 @@
-package institutionqueries
+package institutionsqueries
 
 import (
 	"context"

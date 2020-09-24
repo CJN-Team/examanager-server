@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	database "github.com/CJN-Team/examanager-server/database/userqueries"
+	database "github.com/CJN-Team/examanager-server/database/usersqueries"
 	"github.com/CJN-Team/examanager-server/models"
 )
 
@@ -148,4 +148,24 @@ func GetAllUsersRouter(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(result)
 
+}
+
+//DeleteUserRouter elimina el usuario seleccionado
+func DeleteUserRouter(w http.ResponseWriter, r *http.Request) {
+	ID:= r.URL.Query().Get("id")
+
+	if len(ID)<1{
+		http.Error(w,"Debe enviar el parametro ID", http.StatusBadRequest)
+		return
+	}
+
+	error:=database.DeleteUser(ID)
+
+	if error!=nil{
+		http.Error(w,"Ocurrio un error al intentar borrar un usuario"+error.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-type","application/json")
+	w.WriteHeader(http.StatusCreated)
 }

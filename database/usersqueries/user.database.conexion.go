@@ -1,12 +1,12 @@
-package userqueries
+package usersqueries
 
 import (
 	"context"
 	"log"
 	"time"
 
-	"github.com/CJN-Team/examanager-server/models"
 	dbConnection "github.com/CJN-Team/examanager-server/database"
+	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -183,4 +183,24 @@ func UpdateUser(user models.User, ID string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+//DeleteUser se encarga de borrar el usuario seleccionado
+func DeleteUser(ID string) error {
+	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	database := dbConnection.MongoConexion.Database("examanager_db")
+
+	coleccion := database.Collection("users")
+
+	userID, _ := primitive.ObjectIDFromHex(ID)
+
+	condicion := bson.M{
+		"_id": userID,
+	}
+
+	_, error := coleccion.DeleteOne(contex, condicion)
+
+	return error
 }
