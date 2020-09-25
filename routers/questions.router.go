@@ -103,6 +103,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	
 	status, err := institutionDB.AddQuestionToInstitution(qustionxInstitutionInfo, questionID)
 	if err != nil {
 		http.Error(w, "Ha ocurrido un error al buscar el documento de la institucion "+err.Error(), 400)

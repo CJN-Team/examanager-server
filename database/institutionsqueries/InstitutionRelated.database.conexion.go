@@ -134,9 +134,7 @@ func AddQuestionToInstitution(questionXInstitutionInfo models.QuestionsXInstitut
 	db := dbConnection.MongoConexion.Database("examanager_db")
 	col := db.Collection("QuestionsXInstitution")
 
-	updateString := bson.M{
-		"$set": questionXInstitutionInfo,
-	}
+	updateString := bson.M{ "$push": bson.M{"questionsList":name}}
 
 	id,_ := primitive.ObjectIDFromHex(questionXInstitutionInfo.ID.Hex())
 
