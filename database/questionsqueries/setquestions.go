@@ -21,8 +21,8 @@ func UpdateQuestion(question models.Question, ID string) (bool, error) {
 
 	questionRegisterd := make(map[string]interface{})
 
-	if len(question.Thematic) > 0 {
-		questionRegisterd["thematic"] = question.Thematic
+	if len(question.Topic) > 0 {
+		questionRegisterd["topic"] = question.Topic
 	}
 
 	if len(question.Subject) > 0 {
@@ -30,7 +30,7 @@ func UpdateQuestion(question models.Question, ID string) (bool, error) {
 	}
 
 	if len(question.Pregunta) > 0 {
-		questionRegisterd["pregunta"] = question.Pregunta
+		questionRegisterd["question"] = question.Pregunta
 	}
 
 	if len(question.Category) > 0 {

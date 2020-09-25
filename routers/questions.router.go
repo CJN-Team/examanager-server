@@ -28,7 +28,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "La ID es requerida", 400)
 		return
 	}
-	if len(question.Thematic) == 0 {
+	if len(question.Topic) == 0 {
 		http.Error(w, "La tematica es requerida", 400)
 		return
 	}
