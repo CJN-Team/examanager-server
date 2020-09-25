@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-
+	"fmt"
 	database "github.com/CJN-Team/examanager-server/database/usersqueries"
 	"github.com/CJN-Team/examanager-server/models"
 )
 
 //CreateUser funcion para crear un usuario en la base de datos
 func CreateUser(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("ID de Usuario :" + IDUser)
+	fmt.Println("ID de Institucion :" +InstitutionID)
 	var t models.User
 
 	error := json.NewDecoder(r.Body).Decode(&t)
@@ -87,7 +89,8 @@ func ReadUser(w http.ResponseWriter, r *http.Request) {
 
 //UpdateUser se encarga de la actualizacion del usuario seleccionado
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
-
+	fmt.Println("ID de Usuario :" + IDUser)
+	fmt.Println("ID de Institucion :" +InstitutionID)
 	var user models.User
 
 	error := json.NewDecoder(r.Body).Decode(&user)
@@ -163,6 +166,8 @@ func GetAllUsersRouter(w http.ResponseWriter, r *http.Request) {
 
 //DeleteUserRouter elimina el usuario seleccionado
 func DeleteUserRouter(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("ID de Usuario :" + IDUser)
+	fmt.Println("ID de Institucion :" +InstitutionID)
 	ID := r.URL.Query().Get("id")
 
 	if len(ID) < 1 {
