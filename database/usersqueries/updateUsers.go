@@ -49,7 +49,8 @@ func UpdateUser(user models.User, ID string) (bool, error) {
 	}
 
 	if len(user.Password) > 0 {
-		userRegisterd["password"] = user.Password
+		Password, _ := PasswordEncrypt(user.Password)
+		userRegisterd["password"] = Password
 	}
 
 	updateString := bson.M{
@@ -60,7 +61,6 @@ func UpdateUser(user models.User, ID string) (bool, error) {
 		error := errors.New("el usuario no posee los permisos suficientes")
 		return false, error
 	}
-
 
 	fmt.Println(ID)
 
