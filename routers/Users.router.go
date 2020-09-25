@@ -97,7 +97,18 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	status, error := database.UpdateUser(user, IDUser)
+	id := r.URL.Query().Get("id")
+
+	if len(id) < 1 {
+		http.Error(w, "Debe enviar el perfil a buscar", http.StatusBadRequest)
+		return
+	}
+
+	if IDUser == "" {
+		http.Error(w, "Debes estar logueado", http.StatusBadRequest)
+		return
+	}
+	status, error := database.UpdateUser(user, id,IDUser)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar modificar el registro"+error.Error(), 400)
@@ -152,20 +163,20 @@ func GetAllUsersRouter(w http.ResponseWriter, r *http.Request) {
 
 //DeleteUserRouter elimina el usuario seleccionado
 func DeleteUserRouter(w http.ResponseWriter, r *http.Request) {
-	ID:= r.URL.Query().Get("id")
+	ID := r.URL.Query().Get("id")
 
-	if len(ID)<1{
-		http.Error(w,"Debe enviar el parametro ID", http.StatusBadRequest)
+	if len(ID) < 1 {
+		http.Error(w, "Debe enviar el parametro ID", http.StatusBadRequest)
 		return
 	}
 
-	error:=database.DeleteUser(ID, IDUser)
+	error := database.DeleteUser(ID, IDUser)
 
-	if error!=nil{
-		http.Error(w,"Ocurrio un error al intentar borrar un usuario"+error.Error(), http.StatusBadRequest)
+	if error != nil {
+		http.Error(w, "Ocurrio un error al intentar borrar un usuario"+error.Error(), http.StatusBadRequest)
 		return
 	}
 
-	w.Header().Set("Content-type","application/json")
+	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 }

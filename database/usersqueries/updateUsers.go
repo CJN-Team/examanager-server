@@ -12,7 +12,7 @@ import (
 )
 
 //UpdateUser se encarga de actualizar el usuario registrado
-func UpdateUser(user models.User, ID string) (bool, error) {
+func UpdateUser(user models.User, ID string, loggedUser string) (bool, error) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -39,7 +39,15 @@ func UpdateUser(user models.User, ID string) (bool, error) {
 	}
 
 	if len(user.Email) > 0 {
-		userRegisterd["email"] = user.Email
+		_, exist, _ := GetUserByEmail(user.Email)
+
+		if !exist {
+			userRegisterd["email"] = user.Email
+		} else {
+			error := errors.New("el email ya esta en uso")
+			return false, error
+		}
+
 	}
 
 	userRegisterd["birthDate"] = user.BirthDate
@@ -57,7 +65,7 @@ func UpdateUser(user models.User, ID string) (bool, error) {
 		"$set": userRegisterd,
 	}
 
-	if userTypeVerificationdeleting(ID) {
+	if userTypeVerificationdeleting(loggedUser) {
 		error := errors.New("el usuario no posee los permisos suficientes")
 		return false, error
 	}
