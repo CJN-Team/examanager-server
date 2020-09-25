@@ -46,7 +46,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, status, error := database.AddUser(t)
+	_, status, error := database.AddUser(t, IDUser)
 
 	if error != nil {
 		http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
@@ -159,7 +159,7 @@ func DeleteUserRouter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	error:=database.DeleteUser(ID)
+	error:=database.DeleteUser(ID, IDUser)
 
 	if error!=nil{
 		http.Error(w,"Ocurrio un error al intentar borrar un usuario"+error.Error(), http.StatusBadRequest)
