@@ -24,7 +24,7 @@ func AddInstitution(institutionModel models.Institution) (string, bool, error) {
 	}
 
 	InstitutionID, _ := result.InsertedID.(primitive.ObjectID)
-	return InstitutionID.String(), true, nil
+	return InstitutionID.Hex(), true, nil
 }
 
 //GetInstitutionByName busca en la base de datos la existencia de una institucion por el nombre

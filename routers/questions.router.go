@@ -85,8 +85,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
 		return
 	}
-	fmt.Println("ID de Usuario :" + IDUser)
-	fmt.Println("ID de Institucion :" + InstitutionID)
+	
 	institutionInfo, found, err := institutionDB.GetInstitutionByID(InstitutionID)
 	if err != nil {
 		http.Error(w, "Ha ocurrido un error al buscar el documento de la institucion "+err.Error(), 400)
@@ -103,7 +102,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !found {
-		http.Error(w, "Ha ocurrido un error al actualizar el documento de preguntas de la institucion", 400)
+		http.Error(w, "Ha ocurrido un error al buscar el documento de preguntas de la institucion", 400)
 		return
 	}
 	fmt.Println(qustionxInstitutionInfo)
@@ -130,6 +129,13 @@ func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
 
 	if error != nil {
 		http.Error(w, "Datos Incorrectos"+error.Error(), 400)
+		return
+	}
+
+	id := r.URL.Query().Get("id")
+
+	if len(id) < 1 {
+		http.Error(w, "Debe enviar el perfil a buscar", http.StatusBadRequest)
 		return
 	}
 

@@ -85,8 +85,11 @@ func DeleteSubject(institutionInfo models.Institution, SubjectName string) (bool
 func AddUsersXInstitution(name string) (string, bool, error) {
 
 	var UsersXInstitutionModel models.UsersXInstitution
-	UsersXInstitutionModel.InstitutionName = name
-
+	UsersXInstitutionModel.InstitutionName=name
+	arreglo := primitive.A{}
+	UsersXInstitutionModel.AdminsList = arreglo
+	UsersXInstitutionModel.StudentsList = arreglo
+	UsersXInstitutionModel.TeachersList = arreglo
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -107,8 +110,9 @@ func AddUsersXInstitution(name string) (string, bool, error) {
 func AddQuestionsXInstitution(name string) (string, bool, error) {
 
 	var QuestionsXInstitutionModel models.QuestionsXInstitution
-	QuestionsXInstitutionModel.InstitutionName = name
-
+	QuestionsXInstitutionModel.InstitutionName=name
+	arreglo := primitive.A{}
+	QuestionsXInstitutionModel.QuestionsList = arreglo
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 

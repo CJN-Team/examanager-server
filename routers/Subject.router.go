@@ -3,15 +3,13 @@ package routers
 import (
 	"encoding/json"
 	"net/http"
-	"fmt"
 	database "github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
 )
 
 //CreateSubject permite crear una institucion nueva en la base de datos con el modelo de institucion
 func CreateSubject(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("ID de Usuario :" + IDUser)
-	fmt.Println("ID de Institucion :" +InstitutionID)
+
 	var SubjectInfo models.Subject
 	err := json.NewDecoder(r.Body).Decode(&SubjectInfo)
 
