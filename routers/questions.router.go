@@ -3,11 +3,13 @@ package routers
 import (
 	"encoding/json"
 	"net/http"
+
 	//"strconv"
 
 	"fmt"
-	database "github.com/CJN-Team/examanager-server/database/questionsqueries"
+
 	institutionDB "github.com/CJN-Team/examanager-server/database/institutionsqueries"
+	database "github.com/CJN-Team/examanager-server/database/questionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -49,7 +51,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if question.Category == "Pregunta abierta"{
+	if question.Category == "Pregunta abierta" {
 		if len(question.Options) == 0 {
 			http.Error(w, "Las opciones requerida", 400)
 			return
@@ -84,7 +86,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println("ID de Usuario :" + IDUser)
-	fmt.Println("ID de Institucion :" +InstitutionID)
+	fmt.Println("ID de Institucion :" + InstitutionID)
 	institutionInfo, found, err := institutionDB.GetInstitutionByID(InstitutionID)
 	if err != nil {
 		http.Error(w, "Ha ocurrido un error al buscar el documento de la institucion "+err.Error(), 400)
@@ -105,8 +107,8 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(qustionxInstitutionInfo)
-	
-	status, err = institutionDB.AddQuestionToInstitution(qustionxInstitutionInfo, questionID)
+
+	_, status, err = institutionDB.AddQuestionToInstitution(qustionxInstitutionInfo, questionID)
 	if err != nil {
 		http.Error(w, "Ha ocurrido un error al actualizar el documento de preguntas de la institucion "+err.Error(), 400)
 		return

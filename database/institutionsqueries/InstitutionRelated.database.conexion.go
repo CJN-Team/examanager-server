@@ -9,15 +9,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
 //AddSubject le permite a un administrador de una institucion crear una asignatura
-func AddSubject(institutionInfo models.Institution)(bool,error){
+func AddSubject(institutionInfo models.Institution) (bool, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	db := dbConnection.MongoConexion.Database("examanager_db")
 	col := db.Collection("Institutions")
-
 
 	updateString := bson.M{
 		"$set": institutionInfo,
@@ -36,7 +36,7 @@ func AddSubject(institutionInfo models.Institution)(bool,error){
 }
 
 //DeleteSubject elimina una asignatura de una institucion
-func DeleteSubject(institutionInfo models.Institution, SubjectName string)(bool,error){
+func DeleteSubject(institutionInfo models.Institution, SubjectName string) (bool, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -60,6 +60,7 @@ func DeleteSubject(institutionInfo models.Institution, SubjectName string)(bool,
 	return true, nil
 
 }
+
 /*func GetSubject(institutionInfo models.Institution, SubjectName string)(bool,error){
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
@@ -67,7 +68,7 @@ func DeleteSubject(institutionInfo models.Institution, SubjectName string)(bool,
 
 	db := dbConnection.MongoConexion.Database("examanager_db")
 	col := db.Collection("Institutions")
-	
+
 	id, _ := primitive.ObjectIDFromHex(institutionInfo.ID.Hex())
 	filter := bson.M{"_id": bson.M{"$eq": id}}
 
@@ -80,13 +81,11 @@ func DeleteSubject(institutionInfo models.Institution, SubjectName string)(bool,
 
 }*/
 
-
-
 //AddUsersXInstitution crea un documento que relacionara la institucion que se esta creando con los diferentes usuarios de esta.
-func AddUsersXInstitution(name string)(string,bool,error){
+func AddUsersXInstitution(name string) (string, bool, error) {
 
 	var UsersXInstitutionModel models.UsersXInstitution
-	UsersXInstitutionModel.InstitutionName=name
+	UsersXInstitutionModel.InstitutionName = name
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -103,11 +102,12 @@ func AddUsersXInstitution(name string)(string,bool,error){
 	return UsersXInstitutionID.Hex(), true, nil
 
 }
+
 //AddQuestionsXInstitution crea un documento que relacionara la institucion que se esta creando con las preguntas de esta.
-func AddQuestionsXInstitution(name string)(string,bool,error){
+func AddQuestionsXInstitution(name string) (string, bool, error) {
 
 	var QuestionsXInstitutionModel models.QuestionsXInstitution
-	QuestionsXInstitutionModel.InstitutionName=name
+	QuestionsXInstitutionModel.InstitutionName = name
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -124,9 +124,9 @@ func AddQuestionsXInstitution(name string)(string,bool,error){
 	return QuestionsXInstitutionID.Hex(), true, nil
 
 }
-//AddQuestionToInstitution añade una pregunta relacionada a una institucion a preguntas X institucion
-func AddQuestionToInstitution(questionXInstitutionInfo models.QuestionsXInstitution, name string)(bool,error){
 
+//AddQuestionToInstitution añade una pregunta relacionada a una institucion a preguntas X institucion
+func AddQuestionToInstitution(questionXInstitutionInfo models.QuestionsXInstitution, name string) (string, bool, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -134,18 +134,18 @@ func AddQuestionToInstitution(questionXInstitutionInfo models.QuestionsXInstitut
 	db := dbConnection.MongoConexion.Database("examanager_db")
 	col := db.Collection("QuestionsXInstitution")
 
-	updateString := bson.M{ "$push": bson.M{"questionsList":name}}
+	updateString := bson.M{"$push": bson.M{"questionsList": name}}
 
-	id,_ := primitive.ObjectIDFromHex(questionXInstitutionInfo.ID.Hex())
+	id, _ := primitive.ObjectIDFromHex(questionXInstitutionInfo.ID.Hex())
 
 	filter := bson.M{"_id": bson.M{"$eq": id}}
 
 	_, err := col.UpdateOne(ctx, filter, updateString)
 
 	if err != nil {
-		return false, err
+		return id.Hex(), false, err
 	}
 
-	return true, nil
+	return id.Hex(), true, nil
 
 }

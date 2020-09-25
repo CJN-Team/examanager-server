@@ -2,8 +2,10 @@ package routers
 
 import (
 	"encoding/json"
-	"net/http"
 	"fmt"
+	"net/http"
+	"strings"
+
 	database "github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -59,7 +61,7 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 	InstitutionInfo.Questions = QuestionsXInstitutionID
 	aux := primitive.M{}
 	InstitutionInfo.Subjetcs = aux
-	_, status, err = database.AddInstitution(InstitutionInfo)
+	idInstitution, status, err := database.AddInstitution(InstitutionInfo)
 	if err != nil {
 		http.Error(w, "Ha ocurrido un error al intentar realizar el registro de institucion "+err.Error(), 400)
 		return
@@ -68,6 +70,16 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se ha logrado insertar la institucion nueva ", 400)
 		return
 	}
+
+	idInstitution = strings.Split(idInstitution, "\"")[1]
+	AnswerInstitution := models.AnswerInstitution{
+		InstitutionID: idInstitution,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(AnswerInstitution)
 	w.WriteHeader(http.StatusCreated)
 }
-

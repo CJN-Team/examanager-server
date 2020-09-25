@@ -53,7 +53,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(AnswerLogin)
 
-	//Como generar una cockie
+	//Como generar una coockie
 
 	expirationTime := time.Now().Add(24 * time.Hour)
 	http.SetCookie(w, &http.Cookie{
