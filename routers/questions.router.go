@@ -130,6 +130,13 @@ func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	id := r.URL.Query().Get("id")
+
+	if len(id) < 1 {
+		http.Error(w, "Debe enviar el perfil a buscar", http.StatusBadRequest)
+		return
+	}
+
 	status, error := database.UpdateQuestion(question, primitive.ObjectID.Hex(question.ID))
 
 	if error != nil {
