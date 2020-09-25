@@ -6,6 +6,7 @@ import (
 	//"strconv"
 
 	database "github.com/CJN-Team/examanager-server/database/questionsqueries"
+	institutionDB "github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -70,7 +71,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, status, error := database.AddQuestion(question)
+	questionID, status, error := database.AddQuestion(question)
 
 	if error != nil {
 		http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
@@ -79,6 +80,36 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 
 	if status == false {
 		http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
+		return
+	}
+
+	institutionInfo, found, err := institutionDB.GetInstitutionByID(InstitutionID)
+	if err != nil {
+		http.Error(w, "Ha ocurrido un error al buscar el documento de la institucion "+err.Error(), 400)
+		return
+	}
+	if !found {
+		http.Error(w, "La institucion no existe", 400)
+		return
+	}
+
+	qustionxInstitutionInfo, found, err := database.GetQuestionxInstitution(institutionInfo.Questions)
+	if err != nil {
+		http.Error(w, "Ha ocurrido un error al buscar el documento de la institucion "+err.Error(), 400)
+		return
+	}
+	if !found {
+		http.Error(w, "La institucion no existe", 400)
+		return
+	}
+
+	status, err := institutionDB.AddQuestionToInstitution(qustionxInstitutionInfo, questionID)
+	if err != nil {
+		http.Error(w, "Ha ocurrido un error al buscar el documento de la institucion "+err.Error(), 400)
+		return
+	}
+	if !found {
+		http.Error(w, "La institucion no existe", 400)
 		return
 	}
 
@@ -97,17 +128,17 @@ func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//status, error := database.UpdateQuestion(question, IDUser)
+	status, error := database.UpdateQuestion(question, primitive.ObjectID.Hex(question.ID))
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar modificar el registro"+error.Error(), 400)
 		return
 	}
 
-	/*if status == false {
+	if status == false {
 		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
 		return
-	}*/
+	}
 
 	w.WriteHeader(http.StatusCreated)
 }

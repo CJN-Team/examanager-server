@@ -24,5 +24,5 @@ func AddQuestion (questionModel models.Question) (string, bool, error) {
 	}
 
 	QuestionID, _ := result.InsertedID.(primitive.ObjectID)
-	return QuestionID.String(), true, nil
+	return QuestionID.Hex(), true, nil
 }

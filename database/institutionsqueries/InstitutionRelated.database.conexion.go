@@ -124,8 +124,8 @@ func AddQuestionsXInstitution(name string)(string,bool,error){
 	return QuestionsXInstitutionID.Hex(), true, nil
 
 }
-//AddQuestionXInstitution añade una pregunta relacionada a una institucion a preguntas X institucion
-func AddQuestionXInstitution(questionXInstitutionInfo models.QuestionsXInstitution, name string)(bool,error){
+//AddQuestionToInstitution añade una pregunta relacionada a una institucion a preguntas X institucion
+func AddQuestionToInstitution(questionXInstitutionInfo models.QuestionsXInstitution, name string)(bool,error){
 
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
