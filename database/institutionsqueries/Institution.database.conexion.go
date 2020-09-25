@@ -62,3 +62,27 @@ func GetInstitutionByID(InstitutionID string) (models.Institution, bool,error) {
 	}
 	return institutionInfo, true,nil
 }
+//UpdateInstitution actualiza la institucion con los nuevos campos
+func UpdateInstitution(institutionInfo models.Institution)(bool,error){
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	db := dbConnection.MongoConexion.Database("examanager_db")
+	col := db.Collection("Institutions")	
+
+	updateString := bson.M{
+		"$set": institutionInfo,
+	}
+
+	id,_ := primitive.ObjectIDFromHex(institutionInfo.ID.Hex())
+
+	filter := bson.M{"_id": bson.M{"$eq": id}}
+
+	_, err := col.UpdateOne(ctx, filter, updateString)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}

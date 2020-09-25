@@ -124,4 +124,30 @@ func AddQuestionsXInstitution(name string)(string,bool,error){
 	return QuestionsXInstitutionID.Hex(), true, nil
 
 }
+//AddQuestionXInstitution añade una pregunta relacionada a una institucion a preguntas X institucion
+func AddQuestionXInstitution(questionXInstitutionInfo models.QuestionsXInstitution, name string)(bool,error){
 
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	db := dbConnection.MongoConexion.Database("examanager_db")
+	col := db.Collection("QuestionsXInstitution")
+
+	updateString := bson.M{
+		"$set": questionXInstitutionInfo,
+	}
+
+	id,_ := primitive.ObjectIDFromHex(questionXInstitutionInfo.ID.Hex())
+
+	filter := bson.M{"_id": bson.M{"$eq": id}}
+
+	_, err := col.UpdateOne(ctx, filter, updateString)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+
+}
