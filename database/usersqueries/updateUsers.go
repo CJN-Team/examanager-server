@@ -34,6 +34,10 @@ func UpdateUser(user models.User, ID string, loggedUser string) (bool, error) {
 		userRegisterd["name"] = user.Name
 	}
 
+	if len(user.Institution) > 0 {
+		userRegisterd["institution"] = user.Institution
+	}
+
 	if len(user.LastName) > 0 {
 		userRegisterd["lastName"] = user.LastName
 	}
