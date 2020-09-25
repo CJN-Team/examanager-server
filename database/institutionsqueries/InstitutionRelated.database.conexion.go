@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 //AddSubject le permite a un administrador de una institucion crear una asignatura
-func AddSubject(institutionInfo models.Institution, SubjectInfo models.Subject)(bool,error){
+func AddSubject(institutionInfo models.Institution)(bool,error){
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -18,7 +18,6 @@ func AddSubject(institutionInfo models.Institution, SubjectInfo models.Subject)(
 	db := dbConnection.MongoConexion.Database("examanager_db")
 	col := db.Collection("Institutions")
 
-	institutionInfo.Subjetcs[SubjectInfo.Name] = SubjectInfo.Topics
 
 	updateString := bson.M{
 		"$set": institutionInfo,
@@ -61,6 +60,27 @@ func DeleteSubject(institutionInfo models.Institution, SubjectName string)(bool,
 	return true, nil
 
 }
+/*func GetSubject(institutionInfo models.Institution, SubjectName string)(bool,error){
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	db := dbConnection.MongoConexion.Database("examanager_db")
+	col := db.Collection("Institutions")
+	
+	id, _ := primitive.ObjectIDFromHex(institutionInfo.ID.Hex())
+	filter := bson.M{"_id": bson.M{"$eq": id}}
+
+	_, err := col.UpdateOne(ctx, filter, updateString)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+
+}*/
+
+
 
 //AddUsersXInstitution crea un documento que relacionara la institucion que se esta creando con los diferentes usuarios de esta.
 func AddUsersXInstitution(name string)(string,bool,error){
@@ -104,4 +124,28 @@ func AddQuestionsXInstitution(name string)(string,bool,error){
 	return QuestionsXInstitutionID.Hex(), true, nil
 
 }
+//AddQuestionToInstitution añade una pregunta relacionada a una institucion a preguntas X institucion
+func AddQuestionToInstitution(questionXInstitutionInfo models.QuestionsXInstitution, name string)(bool,error){
 
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	db := dbConnection.MongoConexion.Database("examanager_db")
+	col := db.Collection("QuestionsXInstitution")
+
+	updateString := bson.M{ "$push": bson.M{"questionsList":name}}
+
+	id,_ := primitive.ObjectIDFromHex(questionXInstitutionInfo.ID.Hex())
+
+	filter := bson.M{"_id": bson.M{"$eq": id}}
+
+	_, err := col.UpdateOne(ctx, filter, updateString)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+
+}

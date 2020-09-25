@@ -3,7 +3,7 @@ package routers
 import (
 	"encoding/json"
 	"net/http"
-
+	"fmt"
 	database "github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -12,7 +12,10 @@ import (
 //InstitutionRegistration permite crear una institucion nueva en la base de datos con el modelo de institucion
 func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 	var InstitutionInfo models.Institution
+	r.ParseForm()
+	fmt.Print(r.Form)
 	err := json.NewDecoder(r.Body).Decode(&InstitutionInfo)
+	fmt.Println(InstitutionInfo)
 	if err != nil {
 		http.Error(w, "Error en los datos recibidos "+err.Error(), 400)
 		return
@@ -67,3 +70,4 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusCreated)
 }
+

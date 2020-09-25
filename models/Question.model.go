@@ -12,6 +12,6 @@ type Question struct {
 	Pregunta	string				`bson:"pregunta,omitempty" json:"pregunta,omitempty"`
 	Category	string				`bson:"category,omitempty" json:"category,omitempty"`
 	Options   	[]string			`bson:"options,omitempty" json:"options,omitempty"`
-	Answer		string				`bson:"Answer,omitempty" json:"Answer,omitempty"`
+	Answer		[]int				`bson:"answer,omitempty" json:"answer,omitempty"`
 	Difficulty	int					`bson:"difficulty,omitempty" json:"difficulty,omitempty"`
 }
