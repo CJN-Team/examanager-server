@@ -87,7 +87,10 @@ func AddUsersXInstitution(name string)(string,bool,error){
 
 	var UsersXInstitutionModel models.UsersXInstitution
 	UsersXInstitutionModel.InstitutionName=name
-
+	arreglo := primitive.A{}
+	UsersXInstitutionModel.AdminsList = arreglo
+	UsersXInstitutionModel.StudentsList = arreglo
+	UsersXInstitutionModel.TeachersList = arreglo
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -108,7 +111,8 @@ func AddQuestionsXInstitution(name string)(string,bool,error){
 
 	var QuestionsXInstitutionModel models.QuestionsXInstitution
 	QuestionsXInstitutionModel.InstitutionName=name
-
+	arreglo := primitive.A{}
+	QuestionsXInstitutionModel.QuestionsList = arreglo
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 

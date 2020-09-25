@@ -59,7 +59,7 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 	InstitutionInfo.Questions = QuestionsXInstitutionID
 	aux := primitive.M{}
 	InstitutionInfo.Subjetcs = aux
-	_, status, err = database.AddInstitution(InstitutionInfo)
+	institutionID, status, err := database.AddInstitution(InstitutionInfo)
 	if err != nil {
 		http.Error(w, "Ha ocurrido un error al intentar realizar el registro de institucion "+err.Error(), 400)
 		return
@@ -68,6 +68,11 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se ha logrado insertar la institucion nueva ", 400)
 		return
 	}
+	responseBody := make(map[string]string)
+	responseBody["institutionID"] = institutionID
+	jsonBody, err := json.Marshal(responseBody)
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(jsonBody)
 }
 
