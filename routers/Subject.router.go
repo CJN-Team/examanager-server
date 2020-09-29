@@ -60,7 +60,7 @@ func DeleteSubject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "El nombre de la asignatura a eliminar es requerido", 400)
 		return
 	}
-	if Profile != "admin" {
+	if Profile != "Administrador" {
 		http.Error(w, "Esta opción es válida únicamente para administradores", 403)
 		return
 	}
