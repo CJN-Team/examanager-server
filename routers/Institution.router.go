@@ -72,7 +72,7 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idInstitution = strings.Split(idInstitution, "\"")[1]
-	AnswerInstitution := models.AnswerInstitution{
+	institutionResponse := models.AnswerInstitution{
 		InstitutionID: idInstitution,
 	}
 
@@ -80,6 +80,6 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 
-	json.NewEncoder(w).Encode(AnswerInstitution)
+	json.NewEncoder(w).Encode(institutionResponse)
 	w.WriteHeader(http.StatusCreated)
 }

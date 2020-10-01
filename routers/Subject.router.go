@@ -157,3 +157,23 @@ func UpdateSubjectTopics(subjectName string, SubjectInfo models.Subject, institu
 	}
 	return string(""), true, nil
 }
+//GetSubjects trata de recuperar las asignaturas y las materias de una institucion
+func GetSubjects(w http.ResponseWriter, r *http.Request){
+
+	institutionInfo, found, err := database.GetInstitutionByID(InstitutionID)
+	if err != nil{
+		http.Error(w, "Error al buscar la institucion: "+err.Error(), 400)
+		return
+	}
+	if !found{
+		http.Error(w, "El usuario no está asociado a una institución existente ", 400)
+		return
+	}
+	Sujects := institutionInfo.Subjetcs
+	w.Header().Set("Content-Type", "application/json")
+
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(Sujects)
+	w.WriteHeader(http.StatusCreated)
+}
