@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 
 	database "github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
@@ -71,14 +70,11 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idInstitution = strings.Split(idInstitution, "\"")[1]
 	institutionResponse := models.AnswerInstitution{
 		InstitutionID: idInstitution,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-
-	w.WriteHeader(http.StatusCreated)
 
 	json.NewEncoder(w).Encode(institutionResponse)
 	w.WriteHeader(http.StatusCreated)

@@ -24,6 +24,7 @@ func AddInstitution(institutionModel models.Institution) (string, bool, error) {
 	}
 
 	InstitutionID, _ := result.InsertedID.(primitive.ObjectID)
+	
 	return InstitutionID.Hex(), true, nil
 }
 
