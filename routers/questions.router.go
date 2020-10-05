@@ -2,16 +2,15 @@ package routers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	//"strconv"
-
-	"fmt"
 
 	institutionDB "github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	database "github.com/CJN-Team/examanager-server/database/questionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 //CreateQuestion funcion para crear un usuario en la base de datos
@@ -68,7 +67,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, found, _ := database.GetQuestionByID(primitive.ObjectID.Hex(question.ID))
+	_, found, _ := database.GetQuestionByID(question.ID)
 	if found {
 		http.Error(w, "Ya existe una pregunta con ese ID", 400)
 		return
@@ -85,8 +84,9 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
 		return
 	}
-	
+
 	institutionInfo, found, err := institutionDB.GetInstitutionByID(InstitutionID)
+
 	if err != nil {
 		http.Error(w, "Ha ocurrido un error al buscar el documento de la institucion "+err.Error(), 400)
 		return
@@ -95,7 +95,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "La institucion no existe", 400)
 		return
 	}
-	fmt.Println(institutionInfo)
+
 	qustionxInstitutionInfo, found, err := database.GetQuestionxInstitution(institutionInfo.Questions)
 	if err != nil {
 		http.Error(w, "Ha ocurrido un error al buscar el documento de las preguntas de la institucion "+err.Error(), 400)
@@ -105,7 +105,6 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ha ocurrido un error al buscar el documento de preguntas de la institucion", 400)
 		return
 	}
-	fmt.Println(qustionxInstitutionInfo)
 
 	_, status, err = institutionDB.AddQuestionToInstitution(qustionxInstitutionInfo, questionID)
 	if err != nil {
@@ -122,7 +121,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 
 //UpdateQuestion se encarga de la actualizacion de la pregunta
 func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
-
+	fmt.Println("hoola ")
 	var question models.Question
 
 	error := json.NewDecoder(r.Body).Decode(&question)
@@ -133,13 +132,14 @@ func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := r.URL.Query().Get("id")
+	fmt.Println(id)
 
 	if len(id) < 1 {
-		http.Error(w, "Debe enviar el perfil a buscar", http.StatusBadRequest)
+		http.Error(w, "Debe enviar la pregunta a buscar", http.StatusBadRequest)
 		return
 	}
 
-	status, error := database.UpdateQuestion(question, primitive.ObjectID.Hex(question.ID))
+	status, error := database.UpdateQuestion(question, id)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar modificar el registro"+error.Error(), 400)
@@ -151,5 +151,60 @@ func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusCreated)
+}
+
+//GetAllQuestionsRouter se encarga de devollver todas las preguntas
+func GetAllQuestionsRouter(w http.ResponseWriter, r *http.Request) {
+
+	page, error := strconv.Atoi(r.URL.Query().Get("page"))
+
+	if error != nil {
+		http.Error(w, "Pagina debe ser mayor a 0", http.StatusBadRequest)
+		return
+	}
+
+	pageAux := int64(page)
+
+	category := r.URL.Query().Get("category")
+	category2 := r.URL.Query().Get("category2")
+	specific, error := strconv.Atoi(r.URL.Query().Get("specific"))
+
+	if error != nil {
+		http.Error(w, "specific debe estar definido", http.StatusBadRequest)
+		return
+	}
+	specific = int(specific)
+
+	result, correct := database.GetAllQuestions(category, category2, specific, pageAux)
+
+	if correct == false {
+		http.Error(w, "Error al leer las preguntas", http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(result)
+}
+
+//DeleteQuestionsRouter elimina el usuario seleccionado
+func DeleteQuestionsRouter(w http.ResponseWriter, r *http.Request) {
+	ID := r.URL.Query().Get("id")
+
+	if len(ID) < 1 {
+		http.Error(w, "Debe enviar el parametro ID", http.StatusBadRequest)
+		return
+	}
+
+	error := database.DeleteQuestion(ID)
+
+	if error != nil {
+		http.Error(w, "Ocurrio un error al intentar borrar un usuario"+error.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 }

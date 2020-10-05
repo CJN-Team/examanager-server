@@ -28,6 +28,8 @@ func Manejadores() {
 	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.DeleteUserRouter))).Methods("DELETE")
 	router.HandleFunc("/questions", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateQuestion))).Methods("POST")
 	router.HandleFunc("/questions", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateQuestion))).Methods("PUT")
+	router.HandleFunc("/questions", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllQuestionsRouter))).Methods("GET")
+	router.HandleFunc("/questions", middleware.DatabaseVerify(middleware.ValidationJWT(routers.DeleteQuestionsRouter))).Methods("DELETE")
 	PORT := os.Getenv("PORT")
 
 	if PORT == "" {

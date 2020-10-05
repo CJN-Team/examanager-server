@@ -6,7 +6,6 @@ import (
 
 	dbConnection "github.com/CJN-Team/examanager-server/database"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 //DeleteQuestion elimina una pregunta de la base de datos
@@ -18,10 +17,8 @@ func DeleteQuestion(ID string) error {
 
 	coleccion := database.Collection("Questions")
 
-	userID, _ := primitive.ObjectIDFromHex(ID)
-
 	condicion := bson.M{
-		"_id": userID,
+		"_id": ID,
 	}
 
 	_, error := coleccion.DeleteOne(contex, condicion)
