@@ -25,6 +25,7 @@ func Manejadores() {
 	router.HandleFunc("/subject", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateSubject))).Methods("PUT")
 	router.HandleFunc("/subject", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetSubjects))).Methods("GET")
 	router.HandleFunc("/users", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllUsersRouter))).Methods("GET")
+	router.HandleFunc("/users", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateUsersAutomatic))).Methods("POST")
 	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.DeleteUserRouter))).Methods("DELETE")
 	router.HandleFunc("/questions", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateQuestion))).Methods("POST")
 	router.HandleFunc("/questions", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateQuestion))).Methods("PUT")

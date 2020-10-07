@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+
 	database "github.com/CJN-Team/examanager-server/database/usersqueries"
 	"github.com/CJN-Team/examanager-server/models"
 )
@@ -107,7 +108,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Debes estar logueado", http.StatusBadRequest)
 		return
 	}
-	status, error := database.UpdateUser(user, id,IDUser)
+	status, error := database.UpdateUser(user, id, IDUser)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar modificar el registro"+error.Error(), 400)
@@ -178,4 +179,32 @@ func DeleteUserRouter(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+}
+
+//CreateUsersAutomatic funcion que crea los usuarios de manera automatica por medio de una hoja de calculo
+func CreateUsersAutomatic(w http.ResponseWriter, r *http.Request) {
+	var link models.SearchDocument
+
+	error := json.NewDecoder(r.Body).Decode(&link)
+
+	if error != nil {
+		http.Error(w, "Error en los datos recibidos "+error.Error(), 400)
+		return
+	}
+
+	//Validaciones del link recibido
+
+	if len(link.DocumentLink) == 0 {
+		http.Error(w, "El link debe ser ingresado", 400)
+		return
+	}
+
+	_, error = database.AutomaticCreationUsers(link.DocumentLink, IDUser, link.UserProfile)
+
+	if error != nil {
+		http.Error(w, "Error en la lectura de los datos:  "+error.Error(), 400)
+		return
+	}
+
+	w.WriteHeader(http.StatusAccepted)
 }
