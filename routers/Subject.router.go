@@ -5,6 +5,7 @@ import (
 	"net/http"
 	database "github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 //CreateSubject permite crear una institucion nueva en la base de datos con el modelo de institucion
@@ -159,7 +160,12 @@ func UpdateSubjectTopics(subjectName string, SubjectInfo models.Subject, institu
 }
 //GetSubjects trata de recuperar las asignaturas y las materias de una institucion
 func GetSubjects(w http.ResponseWriter, r *http.Request){
-
+	r.ParseForm()
+	SubjectName := r.Form.Get("name")
+	if SubjectName != "" {
+		GetSubject(w,r,SubjectName)
+		return
+	}
 	institutionInfo, found, err := database.GetInstitutionByID(InstitutionID)
 	if err != nil{
 		http.Error(w, "Error al buscar la institucion: "+err.Error(), 400)
@@ -176,4 +182,47 @@ func GetSubjects(w http.ResponseWriter, r *http.Request){
 
 	json.NewEncoder(w).Encode(Sujects)
 	w.WriteHeader(http.StatusCreated)
+}
+
+func GetSubject(w http.ResponseWriter, r *http.Request, SubjectName string){
+	
+
+	if SubjectName == "" {
+		http.Error(w, "Error en los datos recibidos ", 400)
+		return
+	}
+	if len(SubjectName) < 0 {
+		http.Error(w, "El nombre de la asignatura a eliminar es requerido", 400)
+		return
+	}
+	if Profile != "Administrador" {
+		http.Error(w, "Esta opción es válida únicamente para administradores", 403)
+		return
+	}
+
+	institutionInfo, found, err := database.GetInstitutionByID(InstitutionID)
+	if err != nil {
+		http.Error(w, "Ha ocurrido un error al buscar el documento de la institucion "+err.Error(), 400)
+		return
+	}
+	if !found {
+		http.Error(w, "La institucion no existe", 400)
+		return
+	}
+
+	subject, found := institutionInfo.Subjetcs[SubjectName]
+	subjectInfo := bson.M{
+		SubjectName : subject,
+	}
+	if !found {
+		http.Error(w, "Esta asignatura no existe en la institución ", 406)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(subjectInfo)
+	w.WriteHeader(http.StatusCreated)
+
 }

@@ -6,9 +6,8 @@ import (
 
 	//"strconv"
 
-	"fmt"
+	//"fmt"
 
-	institutionDB "github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	database "github.com/CJN-Team/examanager-server/database/questionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -74,7 +73,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	questionID, status, error := database.AddQuestion(question)
+	_, status, error := database.AddQuestion(question)
 
 	if error != nil {
 		http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
@@ -86,37 +85,6 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	institutionInfo, found, err := institutionDB.GetInstitutionByID(InstitutionID)
-	if err != nil {
-		http.Error(w, "Ha ocurrido un error al buscar el documento de la institucion "+err.Error(), 400)
-		return
-	}
-	if !found {
-		http.Error(w, "La institucion no existe", 400)
-		return
-	}
-	fmt.Println(institutionInfo)
-	qustionxInstitutionInfo, found, err := database.GetQuestionxInstitution(institutionInfo.Questions)
-	if err != nil {
-		http.Error(w, "Ha ocurrido un error al buscar el documento de las preguntas de la institucion "+err.Error(), 400)
-		return
-	}
-	if !found {
-		http.Error(w, "Ha ocurrido un error al buscar el documento de preguntas de la institucion", 400)
-		return
-	}
-	fmt.Println(qustionxInstitutionInfo)
-
-	_, status, err = institutionDB.AddQuestionToInstitution(qustionxInstitutionInfo, questionID)
-	if err != nil {
-		http.Error(w, "Ha ocurrido un error al actualizar el documento de preguntas de la institucion "+err.Error(), 400)
-		return
-	}
-	if !found {
-		http.Error(w, "Ha ocurrido un error al actualizar el documento de preguntas de la institucion", 400)
-		return
-	}
-
 	w.WriteHeader(http.StatusCreated)
 }
 

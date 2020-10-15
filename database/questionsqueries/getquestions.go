@@ -28,26 +28,3 @@ func GetQuestionByID(QuestionID string) (models.Question, bool,error) {
 	return questionInfo, true,nil
 }
 //GetQuestionxInstitution busca en la base de datos el documento que relaciona a las preguntas con la institucion
-func GetQuestionxInstitution(questionxInstitutionID string) (models.QuestionsXInstitution, bool, error) {
-
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-
-	var qustionxInstitutionInfo models.QuestionsXInstitution
-
-
-	db := dbConnection.MongoConexion.Database("examanager_db")
-	col := db.Collection("QuestionsXInstitution")
-	id, err := primitive.ObjectIDFromHex(questionxInstitutionID)
-	
-	if err != nil {
-		return qustionxInstitutionInfo, false,err
-	}
-	err = col.FindOne(ctx,bson.M{"_id":id}).Decode(&qustionxInstitutionInfo)
-
-	if err != nil {
-		return qustionxInstitutionInfo, false,err
-	}
-	return qustionxInstitutionInfo, true,nil
-
-}
