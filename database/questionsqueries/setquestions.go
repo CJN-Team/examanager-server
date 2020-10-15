@@ -7,7 +7,6 @@ import (
 	dbConnection "github.com/CJN-Team/examanager-server/database"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 //UpdateQuestion se encarga de actualizar la informacion de la pregunta
@@ -53,9 +52,7 @@ func UpdateQuestion(question models.Question, ID string) (bool, error) {
 		"$set": questionRegisterd,
 	}
 
-	questionID, _ := primitive.ObjectIDFromHex(ID)
-
-	filter := bson.M{"_id": bson.M{"$eq": questionID}}
+	filter := bson.M{"_id": bson.M{"$eq": ID}}
 
 	_, error := coleccion.UpdateOne(contex, filter, updateString)
 

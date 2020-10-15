@@ -2,6 +2,7 @@ package institutionsqueries
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	dbConnection "github.com/CJN-Team/examanager-server/database"
@@ -24,7 +25,7 @@ func AddInstitution(institutionModel models.Institution) (string, bool, error) {
 	}
 
 	InstitutionID, _ := result.InsertedID.(primitive.ObjectID)
-	
+
 	return InstitutionID.Hex(), true, nil
 }
 
@@ -47,35 +48,36 @@ func GetInstitutionByName(name string) (models.Institution, bool, string) {
 }
 
 //GetInstitutionByID busca en la base de datos la existencia de una institucion por el nombre
-func GetInstitutionByID(InstitutionID string) (models.Institution, bool,error) {
+func GetInstitutionByID(InstitutionID string) (models.Institution, bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	db := dbConnection.MongoConexion.Database("examanager_db")
-	col := db.Collection("Institutions")	
+	col := db.Collection("Institutions")
 
 	var institutionInfo models.Institution
-	id,_ := primitive.ObjectIDFromHex(InstitutionID)
-	err := col.FindOne(ctx,bson.M{"_id": id}).Decode(&institutionInfo)
-
+	id, _ := primitive.ObjectIDFromHex(InstitutionID)
+	err := col.FindOne(ctx, bson.M{"_id": id}).Decode(&institutionInfo)
+	fmt.Println(InstitutionID)
 	if err != nil {
-		return institutionInfo, false,err
+		return institutionInfo, false, err
 	}
-	return institutionInfo, true,nil
+	return institutionInfo, true, nil
 }
+
 //UpdateInstitution actualiza la institucion con los nuevos campos
-func UpdateInstitution(institutionInfo models.Institution)(bool,error){
+func UpdateInstitution(institutionInfo models.Institution) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	db := dbConnection.MongoConexion.Database("examanager_db")
-	col := db.Collection("Institutions")	
+	col := db.Collection("Institutions")
 
 	updateString := bson.M{
 		"$set": institutionInfo,
 	}
 
-	id,_ := primitive.ObjectIDFromHex(institutionInfo.ID.Hex())
+	id, _ := primitive.ObjectIDFromHex(institutionInfo.ID.Hex())
 
 	filter := bson.M{"_id": bson.M{"$eq": id}}
 

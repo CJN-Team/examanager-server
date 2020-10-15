@@ -24,12 +24,12 @@ func AddUser(u models.User, loggedUser string) (string, bool, error) {
 
 	fmt.Println(loggedUser)
 	if loggedUser != "" {
-
-		if userTypeVerificationAdding(loggedUser) {
+		institution, admin := userTypeVerificationAdding(loggedUser)
+		if admin {
 			error := errors.New("el usuario no posee los permisos suficientes")
 			return "", false, error
 		}
-
+		u.Institution = institution
 	} else {
 		u.Profile = "Administrador"
 	}
@@ -44,12 +44,12 @@ func AddUser(u models.User, loggedUser string) (string, bool, error) {
 	return "", true, nil
 }
 
-func userTypeVerificationAdding(loggedUser string) bool {
+func userTypeVerificationAdding(loggedUser string) (string, bool) {
 
 	userID, _ := GetUserByID(loggedUser)
 
 	if userID.Profile != "Administrador" {
-		return true
+		return "", true
 	}
-	return false
+	return userID.Institution, false
 }
