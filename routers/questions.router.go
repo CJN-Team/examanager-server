@@ -14,7 +14,7 @@ import (
 	"github.com/CJN-Team/examanager-server/models"
 )
 
-//CreateQuestion funcion para crear un usuario en la base de datos
+//CreateQuestion funcion para crear las preguntas de la institucion
 func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 	var question models.Question
 
@@ -85,7 +85,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
 		return
 	}
-	
+
 	w.WriteHeader(http.StatusCreated)
 }
 

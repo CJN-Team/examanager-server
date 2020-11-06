@@ -1,4 +1,4 @@
-package questionsqueries
+package examqueries
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-//AddQuestion inserta en la base de datos el modelo de la pregunta
-func AddQuestion(examModel models.Exam) (string, bool, error) {
+//AddExam inserta en la base de datos el modelo de exam
+func AddExam(examModel models.Exam) (string, bool, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()

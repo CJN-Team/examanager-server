@@ -52,6 +52,9 @@ func Manejadores() {
 	//Rutas Grupos
 	router.HandleFunc("/groups", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllGroups))).Methods("GET")
 
+	//Rutas Examen
+	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateExam))).Methods("POST")
+
 	PORT := os.Getenv("PORT")
 
 	if PORT == "" {
