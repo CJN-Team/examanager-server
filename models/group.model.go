@@ -8,4 +8,5 @@ type Group struct {
 	Name         string      `bson:"name,omitempty" json:"name,omitempty"`
 	StudentsList primitive.M `bson:"studentsList,omitempty" json:"studentsList,omitempty"`
 	Teacher      string      `bson:"teacher,omitempty" json:"teacher,omitempty"`
+	Subject      string      `bson:"subject,omitempty" json:"subject,omitempty"`
 }

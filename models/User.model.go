@@ -16,4 +16,5 @@ type User struct {
 	Photo       string    `bson:"photo,omitempty" json:"photo,omitempty"`
 	Institution string    `bson:"institution" json:"institution,omitempty"`
 	Password    string    `bson:"password,omitempty" json:"password,omitempty"`
+	
 }

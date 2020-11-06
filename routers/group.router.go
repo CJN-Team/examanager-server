@@ -43,7 +43,7 @@ func CreateGroup(w http.ResponseWriter, r *http.Request) {
 		group.StudentsList = primitive.M{}
 	}
 
-	_, status, error := database.AddGroup(group, IDUser)
+	_, status, error := database.AddGroup(group, IDUser, InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Error al intentar añadir un registro: "+error.Error(), 400)

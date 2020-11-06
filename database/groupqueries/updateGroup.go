@@ -30,6 +30,10 @@ func UpdateGroup(group models.Group, ID string, loggedUser string) (bool, error)
 		groupRegisterd["teacher"] = group.Teacher
 	}
 
+	if len(group.Subject) > 0 {
+		groupRegisterd["subject"] = group.Subject
+	}
+
 	updateString := bson.M{
 		"$set": groupRegisterd,
 	}
