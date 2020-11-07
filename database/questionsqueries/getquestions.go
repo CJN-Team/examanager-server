@@ -58,7 +58,7 @@ func GetAllQuestions(category string, category2 string, specific int, page int64
 				"category": category,
 			}
 		case 4:
-			difficulty,error:=strconv.Atoi(category)
+			difficulty, error := strconv.Atoi(category)
 			if error != nil {
 				return result, false
 			}
@@ -80,7 +80,7 @@ func GetAllQuestions(category string, category2 string, specific int, page int64
 				"category": category2,
 			}
 		case 3:
-			difficulty,error:=strconv.Atoi(category2)
+			difficulty, error := strconv.Atoi(category2)
 			if error != nil {
 				return result, false
 			}
@@ -95,7 +95,7 @@ func GetAllQuestions(category string, category2 string, specific int, page int64
 				"category": category2,
 			}
 		case 5:
-			difficulty,error:=strconv.Atoi(category2)
+			difficulty, error := strconv.Atoi(category2)
 			if error != nil {
 				return result, false
 			}
@@ -105,7 +105,7 @@ func GetAllQuestions(category string, category2 string, specific int, page int64
 				"difficulty": aux,
 			}
 		case 6:
-			difficulty,error:=strconv.Atoi(category2)
+			difficulty, error := strconv.Atoi(category2)
 			if error != nil {
 				return result, false
 			}
@@ -118,10 +118,11 @@ func GetAllQuestions(category string, category2 string, specific int, page int64
 	}
 
 	searchOptions := options.Find()
-	searchOptions.SetLimit(20)
-	searchOptions.SetSort(bson.D{{Key: "subject", Value: -1}})
-	searchOptions.SetSkip((page - 1) * 20)
-
+	if page != -1 {
+		searchOptions.SetLimit(20)
+		searchOptions.SetSort(bson.D{{Key: "subject", Value: -1}})
+		searchOptions.SetSkip((page - 1) * 20)
+	}
 	pointer, error := col.Find(contex, condicion, searchOptions)
 
 	if error != nil {

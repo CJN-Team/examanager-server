@@ -2,7 +2,6 @@ package routers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -91,7 +90,6 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 
 //UpdateQuestion se encarga de la actualizacion de la pregunta
 func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("hoola ")
 	var question models.Question
 
 	error := json.NewDecoder(r.Body).Decode(&question)
@@ -102,7 +100,6 @@ func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := r.URL.Query().Get("id")
-	fmt.Println(id)
 
 	if len(id) < 1 {
 		http.Error(w, "Debe enviar la pregunta a buscar", http.StatusBadRequest)

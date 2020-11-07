@@ -35,8 +35,8 @@ func AddGroup(group models.Group, loggedUser string, institucionID string) (stri
 		error := errors.New("El profesor es invalido o no esta registrado")
 		return "", false, error
 	}
-	
-	if verifyIfSubjectExist(group.Subject,institucionID) != "" {
+
+	if VerifyIfSubjectExist(group.Subject, institucionID) != "" {
 		error := errors.New("La asignatura ingresada es invalida o no existe")
 		return "", false, error
 	}
@@ -100,7 +100,8 @@ func verifyIfStudentExist(users primitive.M) string {
 
 }
 
-func verifyIfSubjectExist(subject string, institutionID string) string {
+//VerifyIfSubjectExist valida si la asignatura existe
+func VerifyIfSubjectExist(subject string, institutionID string) string {
 
 	institutionInfo, found, error := institutionsqueries.GetInstitutionByID(institutionID)
 

@@ -58,6 +58,7 @@ func Manejadores() {
 
 	//Rutas Examen
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateExam))).Methods("POST")
+	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateGenerateExam))).Methods("PUT")
 
 	PORT := os.Getenv("PORT")
 

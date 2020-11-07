@@ -6,9 +6,10 @@ import (
 
 	//"strconv"
 
-	//"fmt"
+	"fmt"
 
 	database "github.com/CJN-Team/examanager-server/database/examqueries"
+	generateExam "github.com/CJN-Team/examanager-server/database/generateexamqueries"
 	grupDB "github.com/CJN-Team/examanager-server/database/groupqueries"
 	"github.com/CJN-Team/examanager-server/models"
 )
@@ -32,17 +33,24 @@ func CreateExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	very := grupDB.VerifyIfSubjectExist(exam.SubjectID, InstitutionID)
+	if very != "" {
+		http.Error(w, very, 400)
+		return
+	}
+
 	if len(exam.Name) == 0 {
 		http.Error(w, "El nobre del examen es necesario", 400)
 		return
 	}
 
-	if exam.NumberQuestions == 0 {
-		http.Error(w, "El numero de preguntas es necesario", 400)
-		return
+	if exam.State == true {
+
+	} else {
+		exam.State = false
 	}
 
-	if exam.Difficulty == 0 {
+	if len(exam.Difficulty) == 0 {
 		http.Error(w, "La dificultad es necesaria", 400)
 		return
 	}
@@ -69,6 +77,35 @@ func CreateExam(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
 		return
 	}
+
+	w.WriteHeader(http.StatusCreated)
+}
+
+//CreateGenerateExam funcion para crear un examen
+func CreateGenerateExam(w http.ResponseWriter, r *http.Request) {
+	ID := r.URL.Query().Get("id")
+
+	if len(ID) < 1 {
+		http.Error(w, "Falta el parametro ID", http.StatusBadRequest)
+		return
+	}
+	
+	exam, _, _ := database.GetExamByID(ID)
+
+	ids, status, error := generateExam.GenerateExam(exam,IDUser)
+
+	exam.GenerateExam = ids
+	fmt.Println("esto", exam.GenerateExam)
+	if error != nil {
+		http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
+		return
+	}
+
+	if status == false {
+		http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
+		return
+	}
+	status, error = database.UpdateExam(exam, ID)
 
 	w.WriteHeader(http.StatusCreated)
 }
