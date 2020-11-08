@@ -245,7 +245,7 @@ func UploadUserImage(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	var status bool
 
-	user.Photo = ID + "." + fileRoute
+	user.Photo = ID + "." + imageExtencion
 
 	status, error = database.UpdateUser(user, ID, IDUser)
 
@@ -280,7 +280,7 @@ func ReadUserImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_,error =io.Copy(w,file)
+	_, error = io.Copy(w, file)
 
 	if error != nil {
 		http.Error(w, "Error al copiar la imagen:  "+error.Error(), 400)

@@ -26,7 +26,7 @@ func Manejadores() {
 	router.HandleFunc("/users", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateUsersAutomatic))).Methods("POST")
 
 	//Rutas para imagen de usuarios
-	router.HandleFunc("/photo", middleware.DatabaseVerify(middleware.ValidationJWT(routers.ReadUserImage))).Methods("GET")
+	router.HandleFunc("/photo", middleware.DatabaseVerify(routers.ReadUserImage)).Methods("GET")
 	router.HandleFunc("/photo", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UploadUserImage))).Methods("PUT")
 
 	//Inicio de sesion
