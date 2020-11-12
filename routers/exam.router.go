@@ -77,7 +77,7 @@ func CreateExam(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -106,6 +106,6 @@ func CreateGenerateExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	status, error = database.UpdateExam(exam, ID)
-
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }

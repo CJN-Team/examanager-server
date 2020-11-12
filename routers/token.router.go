@@ -2,6 +2,7 @@ package routers
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	database "github.com/CJN-Team/examanager-server/database/usersqueries"
@@ -45,10 +46,21 @@ func GetToken(token string) (*models.Claim, bool, string, string, string, error)
 			Profile = claims.Profile
 			InstitutionID = claims.Institution
 		}
+		fmt.Println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", Email, IDUser, Profile, InstitutionID)
 		return claims, found, IDUser, Profile, InstitutionID, nil
 	}
+	fmt.Println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", Email, IDUser, Profile, InstitutionID)
+
 	if !tokens.Valid {
 		return claims, false, string(""), string(""), string(""), errors.New("token invalido")
 	}
 	return claims, false, string(""), string(""), string(""), error
+}
+
+//CleanToken Limpia las variables globales
+func CleanToken() {
+	Email = ""
+	IDUser = ""
+	Profile = ""
+	InstitutionID = ""
 }

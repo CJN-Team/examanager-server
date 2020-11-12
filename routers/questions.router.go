@@ -84,7 +84,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -117,7 +117,7 @@ func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -149,7 +149,7 @@ func GetAllQuestionsRouter(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error al leer las preguntas", http.StatusBadRequest)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
@@ -171,7 +171,7 @@ func DeleteQuestionsRouter(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ocurrio un error al intentar borrar un usuario"+error.Error(), http.StatusBadRequest)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 }

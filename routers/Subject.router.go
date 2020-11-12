@@ -47,6 +47,7 @@ func CreateSubject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se ha logrado insertar la asignatura nueva ", 400)
 		return
 	}
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -93,6 +94,7 @@ func DeleteSubject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se ha logrado insertar la asignatura nueva ", 400)
 		return
 	}
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -143,6 +145,7 @@ func UpdateSubject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se ha logrado modificar la asignatura: "+response, 400)
 		return
 	}
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -157,6 +160,7 @@ func UpdateSubjectTopics(subjectName string, SubjectInfo models.Subject, institu
 	if !status {
 		return "Error al crear la asignatura nueva ", false, nil
 	}
+	CleanToken()
 	return string(""), true, nil
 }
 
@@ -178,6 +182,9 @@ func GetSubjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	Sujects := institutionInfo.Subjetcs
+
+	CleanToken()
+
 	w.Header().Set("Content-Type", "application/json")
 
 	w.WriteHeader(http.StatusCreated)
@@ -220,6 +227,7 @@ func GetSubject(w http.ResponseWriter, r *http.Request, SubjectName string) {
 		http.Error(w, "Esta asignatura no existe en la institución ", 406)
 		return
 	}
+	CleanToken()
 	w.Header().Set("Content-Type", "application/json")
 
 	w.WriteHeader(http.StatusCreated)

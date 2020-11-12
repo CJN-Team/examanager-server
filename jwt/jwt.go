@@ -18,7 +18,6 @@ func GenerateJWT(user models.User) (string, error) {
 		"idType":      user.IDType,
 		"name":        user.Name,
 		"lastName":    user.LastName,
-		"birthDate":   user.Email,
 		"id":          user.ID,
 		"expiration":  time.Now().Add(time.Hour * 24).Unix(),
 		"institution": user.Institution,

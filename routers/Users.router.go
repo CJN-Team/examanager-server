@@ -80,7 +80,7 @@ func ReadUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("context-type", "application/json")
 
 	w.WriteHeader(http.StatusCreated)
@@ -122,7 +122,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -156,7 +156,7 @@ func GetAllUsersRouter(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error al leer los usuarios", http.StatusBadRequest)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
@@ -179,7 +179,7 @@ func DeleteUserRouter(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ocurrio un error al intentar borrar un usuario"+error.Error(), http.StatusBadRequest)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 }
@@ -208,7 +208,7 @@ func CreateUsersAutomatic(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error en la lectura de los datos:  "+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.WriteHeader(http.StatusAccepted)
 }
 
@@ -253,7 +253,7 @@ func UploadUserImage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error al guardar la ruta en la base de datos:  "+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 }
 
 //ReadUserImage funcion para subir o cambiar la imagen de un usuario
@@ -286,4 +286,6 @@ func ReadUserImage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error al copiar la imagen:  "+error.Error(), 400)
 		return
 	}
+
+	CleanToken()
 }

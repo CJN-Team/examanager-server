@@ -54,7 +54,7 @@ func CreateGroup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se logro añadir un registro: "+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -74,7 +74,7 @@ func ReadGroup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("context-type", "application/json")
 
 	w.WriteHeader(http.StatusCreated)
@@ -105,7 +105,7 @@ func GetAllGroups(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error al leer los grupos", http.StatusBadRequest)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
@@ -130,7 +130,7 @@ func DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ocurrio un error al intentar borrar un grupo"+error.Error(), http.StatusBadRequest)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 }
@@ -169,6 +169,6 @@ func UpdateGroup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
