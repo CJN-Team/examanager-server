@@ -12,7 +12,7 @@ import (
 )
 
 //GetAllGroups se encarga de traer de base de datos todos los grupos almacenados
-func GetAllGroups(page int64) ([]*models.Group, bool) {
+func GetAllGroups(page int64, institution string) ([]*models.Group, bool) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -22,7 +22,9 @@ func GetAllGroups(page int64) ([]*models.Group, bool) {
 
 	var result []*models.Group
 
-	condicion := bson.M{}
+	condicion := bson.M{
+		"institution": institution,
+	}
 
 	searchOptions := options.Find()
 	searchOptions.SetLimit(20)
@@ -49,7 +51,7 @@ func GetAllGroups(page int64) ([]*models.Group, bool) {
 }
 
 //GetGroupByID se encarga de buscar en la base de datos el grupo que posee la ID asignada
-func GetGroupByID(ID string) (models.Group, error) {
+func GetGroupByID(ID string, institution string) (models.Group, error) {
 
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -60,7 +62,7 @@ func GetGroupByID(ID string) (models.Group, error) {
 
 	var result models.Group
 
-	condicion := bson.M{"_id": ID}
+	condicion := bson.M{"_id": ID, "institution": institution}
 
 	error := coleccion.FindOne(contex, condicion).Decode(&result)
 

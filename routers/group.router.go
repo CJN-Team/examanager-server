@@ -14,6 +14,7 @@ import (
 //CreateGroup funcion para crear un grupo en la base de datos
 func CreateGroup(w http.ResponseWriter, r *http.Request) {
 	var group models.Group
+	group.Institution = InstitutionID
 
 	error := json.NewDecoder(r.Body).Decode(&group)
 
@@ -68,7 +69,7 @@ func ReadGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, error := database.GetGroupByID(ID)
+	user, error := database.GetGroupByID(ID, InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
@@ -99,7 +100,7 @@ func GetAllGroups(w http.ResponseWriter, r *http.Request) {
 
 	pageAux := int64(page)
 
-	result, correct := database.GetAllGroups(pageAux)
+	result, correct := database.GetAllGroups(pageAux, InstitutionID)
 
 	if correct == false {
 		http.Error(w, "Error al leer los grupos", http.StatusBadRequest)

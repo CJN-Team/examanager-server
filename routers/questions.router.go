@@ -16,6 +16,7 @@ import (
 //CreateQuestion funcion para crear las preguntas de la institucion
 func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 	var question models.Question
+	question.Institution = InstitutionID
 
 	error := json.NewDecoder(r.Body).Decode(&question)
 
@@ -67,7 +68,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, found, _ := database.GetQuestionByID(question.ID)
+	_, found, _ := database.GetQuestionByID(question.ID, InstitutionID)
 	if found {
 		http.Error(w, "Ya existe una pregunta con ese ID", 400)
 		return
@@ -143,7 +144,7 @@ func GetAllQuestionsRouter(w http.ResponseWriter, r *http.Request) {
 	}
 	specific = int(specific)
 
-	result, correct := database.GetAllQuestions(category, category2, specific, pageAux)
+	result, correct := database.GetAllQuestions(category, category2, specific, pageAux, InstitutionID)
 
 	if correct == false {
 		http.Error(w, "Error al leer las preguntas", http.StatusBadRequest)

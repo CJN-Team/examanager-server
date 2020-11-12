@@ -34,10 +34,10 @@ func AddGenerateExam(generateExamModel models.GenerateExam) (string, bool, error
 }
 
 //GenerateExam genera los examenes
-func GenerateExam(examModel models.Exam, loggedUser string) ([]string, bool, error) {
+func GenerateExam(examModel models.Exam, loggedUser string, institution string) ([]string, bool, error) {
 	var generateExam models.GenerateExam
 	var ids []string
-	group, err := grupDB.GetGroupByID(examModel.GroupID)
+	group, err := grupDB.GetGroupByID(examModel.GroupID, institution)
 
 	if err != nil {
 		return ids, false, err
@@ -52,7 +52,7 @@ func GenerateExam(examModel models.Exam, loggedUser string) ([]string, bool, err
 		generateExam.Institution = institution.Name
 		generateExam.Photo = student.Photo
 		generateExam.Name = examModel.Name
-		generateExam.Question, _, _ = GetQuestions(examModel)
+		generateExam.Question, _, _ = GetQuestions(examModel, student.Institution)
 
 		id, _, _ := AddGenerateExam(generateExam)
 
@@ -65,12 +65,12 @@ func GenerateExam(examModel models.Exam, loggedUser string) ([]string, bool, err
 }
 
 //GetQuestions trae las preguntas necesarias para el examen
-func GetQuestions(examModel models.Exam) ([]string, bool, error) {
+func GetQuestions(examModel models.Exam, institution string) ([]string, bool, error) {
 	var questions []string
 	var random int
-	questionsFacil, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "1", 3, -1)
-	questionsNormal, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "2", 3, -1)
-	questionsDificil, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "3", 3, -1)
+	questionsFacil, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "1", 3, -1, institution)
+	questionsNormal, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "2", 3, -1, institution)
+	questionsDificil, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "3", 3, -1, institution)
 	facil := examModel.Difficulty[0]
 	normal := examModel.Difficulty[1]
 	dificil := examModel.Difficulty[2]

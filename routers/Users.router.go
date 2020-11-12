@@ -150,7 +150,7 @@ func GetAllUsersRouter(w http.ResponseWriter, r *http.Request) {
 
 	pageAux := int64(page)
 
-	result, correct := database.GetAllUsers(profile, pageAux)
+	result, correct := database.GetAllUsers(profile, InstitutionID, pageAux)
 
 	if correct == false {
 		http.Error(w, "Error al leer los usuarios", http.StatusBadRequest)

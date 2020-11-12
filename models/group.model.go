@@ -7,6 +7,7 @@ type Group struct {
 	ID           string      `bson:"_id,omitempty" json:"id"`
 	Name         string      `bson:"name,omitempty" json:"name,omitempty"`
 	StudentsList primitive.M `bson:"studentsList,omitempty" json:"studentsList,omitempty"`
+	Institution  string      `bson:"institution,omitempty" json:"institution,omitempty"`
 	Teacher      string      `bson:"teacher,omitempty" json:"teacher,omitempty"`
 	Subject      string      `bson:"subject,omitempty" json:"subject,omitempty"`
 }

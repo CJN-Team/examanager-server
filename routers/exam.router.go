@@ -27,7 +27,7 @@ func CreateExam(w http.ResponseWriter, r *http.Request) {
 
 	//Validaciones de los datos a registrar
 
-	_, err := grupDB.GetGroupByID(exam.GroupID)
+	_, err := grupDB.GetGroupByID(exam.GroupID, InstitutionID)
 	if err != nil {
 		http.Error(w, "El grupo no existe", 400)
 		return
@@ -89,10 +89,10 @@ func CreateGenerateExam(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Falta el parametro ID", http.StatusBadRequest)
 		return
 	}
-	
+
 	exam, _, _ := database.GetExamByID(ID)
 
-	ids, status, error := generateExam.GenerateExam(exam,IDUser)
+	ids, status, error := generateExam.GenerateExam(exam, IDUser, InstitutionID)
 
 	exam.GenerateExam = ids
 	fmt.Println("esto", exam.GenerateExam)

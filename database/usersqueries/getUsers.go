@@ -12,7 +12,7 @@ import (
 )
 
 //GetAllUsers se encarga de traer de base de datos todos los usuarios disponibles de una categoria
-func GetAllUsers(category string, page int64) ([]*models.User, bool) {
+func GetAllUsers(category string, institution string, page int64) ([]*models.User, bool) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -23,7 +23,8 @@ func GetAllUsers(category string, page int64) ([]*models.User, bool) {
 	var result []*models.User
 
 	condicion := bson.M{
-		"profile": category,
+		"profile":     category,
+		"institution": institution,
 	}
 
 	searchOptions := options.Find()
@@ -88,7 +89,7 @@ func GetUserByID(ID string) (models.User, error) {
 
 	var result models.User
 
-	ObjectID:= ID
+	ObjectID := ID
 
 	condicion := bson.M{"_id": ObjectID}
 
