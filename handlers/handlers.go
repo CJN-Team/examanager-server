@@ -16,7 +16,9 @@ func Manejadores() {
 	router := mux.NewRouter()
 
 	//Rutas para usuario
-	router.HandleFunc("/user", middleware.DatabaseVerify(routers.CreateUser)).Methods("POST")
+	router.HandleFunc("/admin", middleware.DatabaseVerify(routers.CreateUser)).Methods("POST")
+	
+	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateUser))).Methods("POST")
 	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateUser))).Methods("PUT")
 	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.ReadUser))).Methods("GET")
 	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.DeleteUserRouter))).Methods("DELETE")
