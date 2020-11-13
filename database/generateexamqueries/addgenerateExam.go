@@ -52,7 +52,8 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 		generateExam.Institution = institution.Name
 		generateExam.Photo = student.Photo
 		generateExam.Name = examModel.Name
-		generateExam.Question, _, _ = GetQuestions(examModel, student.Institution)
+		generateExam.Questions, _, _ = GetQuestions(examModel, student.Institution)
+
 
 		id, _, _ := AddGenerateExam(generateExam)
 
@@ -65,8 +66,8 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 }
 
 //GetQuestions trae las preguntas necesarias para el examen
-func GetQuestions(examModel models.Exam, institution string) ([]string, bool, error) {
-	var questions []string
+func GetQuestions(examModel models.Exam, institution string) (map[string]float32, bool, error) {
+	var questions map[string]float32
 	var random int
 	questionsFacil, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "1", 3, -1, institution)
 	questionsNormal, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "2", 3, -1, institution)
@@ -78,24 +79,24 @@ func GetQuestions(examModel models.Exam, institution string) ([]string, bool, er
 	i := 0
 	for i < facil {
 		random = rand.Intn(len(questionsFacil) - 1)
-		if !contains(questions, questionsFacil[random].ID) {
-			questions = append(questions, questionsFacil[random].ID)
+		if _, exist := questions[questionsFacil[random].ID]; !exist{
+			questions[questionsFacil[random].ID] = 0.0
 			i++
 		}
 	}
 	i = 0
 	for i < normal {
 		random = rand.Intn(len(questionsNormal) - 1)
-		if !contains(questions, questionsNormal[random].ID) {
-			questions = append(questions, questionsNormal[random].ID)
+		if _, exist := questions[questionsNormal[random].ID]; !exist{
+			questions[questionsNormal[random].ID] = 0.0
 			i++
 		}
 	}
 	i = 0
 	for i < dificil {
 		random = rand.Intn(len(questionsDificil) - 1)
-		if !contains(questions, questionsDificil[random].ID) {
-			questions = append(questions, questionsDificil[random].ID)
+		if _, exist := questions[questionsDificil[random].ID]; !exist{
+			questions[questionsDificil[random].ID] = 0.0
 			i++
 		}
 	}

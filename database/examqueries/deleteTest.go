@@ -1,4 +1,4 @@
-package questionsqueries
+package examqueries
 
 import (
 	"context"
