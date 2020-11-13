@@ -3,6 +3,7 @@ package routers
 import (
 	"encoding/json"
 	"net/http"
+
 	database "github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -46,6 +47,7 @@ func CreateSubject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se ha logrado insertar la asignatura nueva ", 400)
 		return
 	}
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -92,6 +94,7 @@ func DeleteSubject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se ha logrado insertar la asignatura nueva ", 400)
 		return
 	}
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -132,16 +135,17 @@ func UpdateSubject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Esta asignatura no existe en la institución ", 400)
 		return
 	}
-	
+
 	response, status, err := UpdateSubjectTopics(subjectName[0], SubjectInfo, institutionInfo)
 	if err != nil {
 		http.Error(w, "Ha ocurrido un error al modificar la asignatura"+err.Error(), 400)
-	return
+		return
 	}
 	if !status {
 		http.Error(w, "No se ha logrado modificar la asignatura: "+response, 400)
 		return
 	}
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -156,26 +160,31 @@ func UpdateSubjectTopics(subjectName string, SubjectInfo models.Subject, institu
 	if !status {
 		return "Error al crear la asignatura nueva ", false, nil
 	}
+	CleanToken()
 	return string(""), true, nil
 }
+
 //GetSubjects trata de recuperar las asignaturas y las materias de una institucion
-func GetSubjects(w http.ResponseWriter, r *http.Request){
+func GetSubjects(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	SubjectName := r.Form.Get("name")
 	if SubjectName != "" {
-		GetSubject(w,r,SubjectName)
+		GetSubject(w, r, SubjectName)
 		return
 	}
 	institutionInfo, found, err := database.GetInstitutionByID(InstitutionID)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Error al buscar la institucion: "+err.Error(), 400)
 		return
 	}
-	if !found{
+	if !found {
 		http.Error(w, "El usuario no está asociado a una institución existente ", 400)
 		return
 	}
 	Sujects := institutionInfo.Subjetcs
+
+	CleanToken()
+
 	w.Header().Set("Content-Type", "application/json")
 
 	w.WriteHeader(http.StatusCreated)
@@ -184,8 +193,8 @@ func GetSubjects(w http.ResponseWriter, r *http.Request){
 	w.WriteHeader(http.StatusCreated)
 }
 
-func GetSubject(w http.ResponseWriter, r *http.Request, SubjectName string){
-	
+//GetSubject trata de recuperar una asignatura 
+func GetSubject(w http.ResponseWriter, r *http.Request, SubjectName string) {
 
 	if SubjectName == "" {
 		http.Error(w, "Error en los datos recibidos ", 400)
@@ -212,12 +221,13 @@ func GetSubject(w http.ResponseWriter, r *http.Request, SubjectName string){
 
 	subject, found := institutionInfo.Subjetcs[SubjectName]
 	subjectInfo := bson.M{
-		SubjectName : subject,
+		SubjectName: subject,
 	}
 	if !found {
 		http.Error(w, "Esta asignatura no existe en la institución ", 406)
 		return
 	}
+	CleanToken()
 	w.Header().Set("Content-Type", "application/json")
 
 	w.WriteHeader(http.StatusCreated)

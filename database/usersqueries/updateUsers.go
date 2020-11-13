@@ -43,10 +43,13 @@ func UpdateUser(user models.User, ID string, loggedUser string) (bool, error) {
 	}
 
 	if len(user.Email) > 0 {
-		_, exist, _ := GetUserByEmail(user.Email)
+		usermodel, exist, _ := GetUserByEmail(user.Email)
 
 		if !exist {
 			userRegisterd["email"] = user.Email
+		} else if ID == usermodel.ID {
+			userRegisterd["email"] = user.Email
+
 		} else {
 			error := errors.New("el email ya esta en uso")
 			return false, error

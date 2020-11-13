@@ -14,6 +14,7 @@ import (
 //CreateGroup funcion para crear un grupo en la base de datos
 func CreateGroup(w http.ResponseWriter, r *http.Request) {
 	var group models.Group
+	group.Institution = InstitutionID
 
 	error := json.NewDecoder(r.Body).Decode(&group)
 
@@ -43,7 +44,7 @@ func CreateGroup(w http.ResponseWriter, r *http.Request) {
 		group.StudentsList = primitive.M{}
 	}
 
-	_, status, error := database.AddGroup(group, IDUser)
+	_, status, error := database.AddGroup(group, IDUser, InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Error al intentar añadir un registro: "+error.Error(), 400)
@@ -54,7 +55,7 @@ func CreateGroup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se logro añadir un registro: "+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -68,13 +69,13 @@ func ReadGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, error := database.GetGroupByID(ID)
+	user, error := database.GetGroupByID(ID, InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("context-type", "application/json")
 
 	w.WriteHeader(http.StatusCreated)
@@ -99,13 +100,13 @@ func GetAllGroups(w http.ResponseWriter, r *http.Request) {
 
 	pageAux := int64(page)
 
-	result, correct := database.GetAllGroups(pageAux)
+	result, correct := database.GetAllGroups(pageAux, InstitutionID)
 
 	if correct == false {
 		http.Error(w, "Error al leer los grupos", http.StatusBadRequest)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
@@ -130,7 +131,7 @@ func DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ocurrio un error al intentar borrar un grupo"+error.Error(), http.StatusBadRequest)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 }
@@ -169,6 +170,6 @@ func UpdateGroup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }

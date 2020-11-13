@@ -42,6 +42,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error generando el token"+error.Error(), 400)
 		return
 	}
+	_, _, _, _, _, error = GetToken("Bearer" + jwtKey)
+
+	if error != nil {
+		http.Error(w, "Error iniciando sesion"+error.Error(), 400)
+		return
+	}
 
 	AnswerLogin := models.AnswerLogin{
 		Token: jwtKey,
@@ -63,5 +69,3 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	})
 
 }
-
-

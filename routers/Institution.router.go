@@ -73,7 +73,7 @@ func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 	institutionResponse := models.AnswerInstitution{
 		InstitutionID: idInstitution,
 	}
-
+	CleanToken()
 	w.Header().Set("Content-Type", "application/json")
 
 	json.NewEncoder(w).Encode(institutionResponse)

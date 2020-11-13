@@ -11,7 +11,7 @@ import (
 
 //MongoConexion es el objeto para conectarme a la base de datos
 var MongoConexion = ConnectBD()
-var clientOptions = options.Client().ApplyURI("mongodb://" + os.Getenv("MONGO_HOSTNAME") + ":" + os.Getenv("MONGO_PORT") + "/" + os.Getenv("MONGO_DB"))
+var clientOptions = options.Client().ApplyURI("mongodb+srv://" + os.Getenv("USER") + ":" + os.Getenv("PASSWORD") + "@examangerdb.1dbzg.mongodb.net/" + os.Getenv("DATABASE") + "?retryWrites=true&w=majority")
 
 //ConnectBD es la funcion que me permite conectarme con la base de datos
 func ConnectBD() *mongo.Client {

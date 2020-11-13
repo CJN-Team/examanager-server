@@ -2,7 +2,6 @@ package routers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -14,9 +13,10 @@ import (
 	"github.com/CJN-Team/examanager-server/models"
 )
 
-//CreateQuestion funcion para crear un usuario en la base de datos
+//CreateQuestion funcion para crear las preguntas de la institucion
 func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 	var question models.Question
+	question.Institution = InstitutionID
 
 	error := json.NewDecoder(r.Body).Decode(&question)
 
@@ -68,7 +68,7 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, found, _ := database.GetQuestionByID(question.ID)
+	_, found, _ := database.GetQuestionByID(question.ID, InstitutionID)
 	if found {
 		http.Error(w, "Ya existe una pregunta con ese ID", 400)
 		return
@@ -85,13 +85,12 @@ func CreateQuestion(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
 		return
 	}
-	
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
 //UpdateQuestion se encarga de la actualizacion de la pregunta
 func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("hoola ")
 	var question models.Question
 
 	error := json.NewDecoder(r.Body).Decode(&question)
@@ -102,7 +101,6 @@ func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := r.URL.Query().Get("id")
-	fmt.Println(id)
 
 	if len(id) < 1 {
 		http.Error(w, "Debe enviar la pregunta a buscar", http.StatusBadRequest)
@@ -120,7 +118,7 @@ func UpdateQuestion(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
 		return
 	}
-
+	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -146,13 +144,13 @@ func GetAllQuestionsRouter(w http.ResponseWriter, r *http.Request) {
 	}
 	specific = int(specific)
 
-	result, correct := database.GetAllQuestions(category, category2, specific, pageAux)
+	result, correct := database.GetAllQuestions(category, category2, specific, pageAux, InstitutionID)
 
 	if correct == false {
 		http.Error(w, "Error al leer las preguntas", http.StatusBadRequest)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
@@ -174,7 +172,7 @@ func DeleteQuestionsRouter(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ocurrio un error al intentar borrar un usuario"+error.Error(), http.StatusBadRequest)
 		return
 	}
-
+	CleanToken()
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 }

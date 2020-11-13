@@ -16,7 +16,9 @@ func Manejadores() {
 	router := mux.NewRouter()
 
 	//Rutas para usuario
-	router.HandleFunc("/user", middleware.DatabaseVerify(routers.CreateUser)).Methods("POST")
+	router.HandleFunc("/admin", middleware.DatabaseVerify(routers.CreateUser)).Methods("POST")
+	
+	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateUser))).Methods("POST")
 	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateUser))).Methods("PUT")
 	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.ReadUser))).Methods("GET")
 	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.DeleteUserRouter))).Methods("DELETE")
@@ -24,6 +26,10 @@ func Manejadores() {
 	//Rutas para usuarios
 	router.HandleFunc("/users", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllUsersRouter))).Methods("GET")
 	router.HandleFunc("/users", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateUsersAutomatic))).Methods("POST")
+
+	//Rutas para imagen de usuarios
+	router.HandleFunc("/photo", middleware.DatabaseVerify(routers.ReadUserImage)).Methods("GET")
+	router.HandleFunc("/photo", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UploadUserImage))).Methods("PUT")
 
 	//Inicio de sesion
 	router.HandleFunc("/login", middleware.DatabaseVerify(routers.Login)).Methods("POST")
@@ -52,11 +58,10 @@ func Manejadores() {
 	//Rutas Grupos
 	router.HandleFunc("/groups", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllGroups))).Methods("GET")
 
+	//Rutas Examen
+	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateExam))).Methods("POST")
+	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateGenerateExam))).Methods("PUT")
 
-	//Rutas para Examenes
-
-
-	
 	PORT := os.Getenv("PORT")
 
 	if PORT == "" {

@@ -7,13 +7,14 @@ import (
 	"time"
 
 	dbConnection "github.com/CJN-Team/examanager-server/database"
+	"github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/database/usersqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 //AddGroup se encarga de añadir a la base de datos un nuevo usuario
-func AddGroup(group models.Group, loggedUser string) (string, bool, error) {
+func AddGroup(group models.Group, loggedUser string, institucionID string) (string, bool, error) {
 
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -32,6 +33,11 @@ func AddGroup(group models.Group, loggedUser string) (string, bool, error) {
 
 	if verifyIfTeacherExist(group.Teacher) != nil {
 		error := errors.New("El profesor es invalido o no esta registrado")
+		return "", false, error
+	}
+
+	if VerifyIfSubjectExist(group.Subject, institucionID) != "" {
+		error := errors.New("La asignatura ingresada es invalida o no existe")
 		return "", false, error
 	}
 
@@ -90,6 +96,31 @@ func verifyIfStudentExist(users primitive.M) string {
 	if errors {
 		return wrongUsers
 	}
+	return ""
+
+}
+
+//VerifyIfSubjectExist valida si la asignatura existe
+func VerifyIfSubjectExist(subject string, institutionID string) string {
+
+	institutionInfo, found, error := institutionsqueries.GetInstitutionByID(institutionID)
+
+	if error != nil {
+		return "Fallo al buscar la institucion"
+	}
+
+	if !found {
+		return "La institucion no existe"
+	}
+
+	_, found = institutionInfo.Subjetcs[subject]
+
+	if !found {
+
+		return "Esta asignatura no existe en la institución "
+
+	}
+
 	return ""
 
 }
