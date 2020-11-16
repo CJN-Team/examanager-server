@@ -42,18 +42,17 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 	if err != nil {
 		return ids, false, err
 	}
-
 	for key, value := range group.StudentsList {
 		generateExam.Teacher = group.Teacher
 		student, _ := userDB.GetUserByID(key)
 		generateExam.Student = student.Name + " " + student.LastName
 		generateExam.Date = examModel.Date
+		generateExam.Topic = examModel.TopicQuestion
 		institution, _, _ := institutionDB.GetInstitutionByID(student.Institution)
 		generateExam.Institution = institution.Name
 		generateExam.Photo = student.Photo
 		generateExam.Name = examModel.Name
 		generateExam.Questions, _, _ = GetQuestions(examModel, student.Institution)
-
 
 		id, _, _ := AddGenerateExam(generateExam)
 
@@ -67,7 +66,7 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 
 //GetQuestions trae las preguntas necesarias para el examen
 func GetQuestions(examModel models.Exam, institution string) (map[string]float32, bool, error) {
-	var questions map[string]float32
+	questions := make(map[string]float32)
 	var random int
 	questionsFacil, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "1", 3, -1, institution)
 	questionsNormal, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "2", 3, -1, institution)
@@ -75,11 +74,10 @@ func GetQuestions(examModel models.Exam, institution string) (map[string]float32
 	facil := examModel.Difficulty[0]
 	normal := examModel.Difficulty[1]
 	dificil := examModel.Difficulty[2]
-
 	i := 0
 	for i < facil {
 		random = rand.Intn(len(questionsFacil) - 1)
-		if _, exist := questions[questionsFacil[random].ID]; !exist{
+		if _, exist := questions[questionsFacil[random].ID]; !exist {
 			questions[questionsFacil[random].ID] = 0.0
 			i++
 		}
@@ -87,7 +85,7 @@ func GetQuestions(examModel models.Exam, institution string) (map[string]float32
 	i = 0
 	for i < normal {
 		random = rand.Intn(len(questionsNormal) - 1)
-		if _, exist := questions[questionsNormal[random].ID]; !exist{
+		if _, exist := questions[questionsNormal[random].ID]; !exist {
 			questions[questionsNormal[random].ID] = 0.0
 			i++
 		}
@@ -95,7 +93,7 @@ func GetQuestions(examModel models.Exam, institution string) (map[string]float32
 	i = 0
 	for i < dificil {
 		random = rand.Intn(len(questionsDificil) - 1)
-		if _, exist := questions[questionsDificil[random].ID]; !exist{
+		if _, exist := questions[questionsDificil[random].ID]; !exist {
 			questions[questionsDificil[random].ID] = 0.0
 			i++
 		}

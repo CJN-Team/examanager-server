@@ -3,14 +3,13 @@ package routers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	//"strconv"
 
-	"fmt"
-
 	database "github.com/CJN-Team/examanager-server/database/examqueries"
 	generateExam "github.com/CJN-Team/examanager-server/database/generateexamqueries"
-	
+
 	grupDB "github.com/CJN-Team/examanager-server/database/groupqueries"
 	"github.com/CJN-Team/examanager-server/models"
 )
@@ -44,7 +43,10 @@ func CreateExam(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "El nobre del examen es necesario", 400)
 		return
 	}
-
+	if len(exam.Institution) == 0 {
+		http.Error(w, "la institucion es necesaria", 400)
+		return
+	}
 	if exam.State == true {
 
 	} else {
@@ -61,7 +63,7 @@ func CreateExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, found, _ := database.GetExamByName(exam.Name)
+	_, found, _ := database.GetExamByName(exam.Name, InstitutionID)
 	if found {
 		http.Error(w, "Ya existe un examen con ese nombre", 400)
 		return
@@ -91,12 +93,16 @@ func CreateGenerateExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exam, _, _ := database.GetExamByID(ID)
+	exam, _, _ := database.GetExamByID(ID, InstitutionID)
+
+	if len(exam.GenerateExam) != 0 {
+		http.Error(w, "ya se han generado los examenes de este modelo", 400)
+		return
+	}
 
 	ids, status, error := generateExam.GenerateExam(exam, IDUser, InstitutionID)
 
 	exam.GenerateExam = ids
-	fmt.Println("esto", exam.GenerateExam)
 	if error != nil {
 		http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
 		return
@@ -109,4 +115,42 @@ func CreateGenerateExam(w http.ResponseWriter, r *http.Request) {
 	status, error = database.UpdateExam(exam, ID)
 	CleanToken()
 	w.WriteHeader(http.StatusCreated)
+}
+
+//GetAllExams permite tomar todos los examenes de un grupo
+func GetAllExams(w http.ResponseWriter, r *http.Request) {
+
+	if len(r.URL.Query().Get("page")) < 1 {
+		http.Error(w, "Debe enviar el parametro pagina", http.StatusBadRequest)
+		return
+	}
+
+	page, error := strconv.Atoi(r.URL.Query().Get("page"))
+
+	if error != nil {
+		http.Error(w, "Pagina debe ser mayor a 0", http.StatusBadRequest)
+		return
+	}
+
+	pageAux := int64(page)
+
+	groupID := r.URL.Query().Get("groupid")
+
+	if len(groupID) < 1 {
+		http.Error(w, "Falta el parametro groupID", http.StatusBadRequest)
+		return
+	}
+
+	result, correct := database.GetAllExamByGroup(groupID, InstitutionID, pageAux)
+
+	if correct == false {
+		http.Error(w, "Error al leer los grupos", http.StatusBadRequest)
+		return
+	}
+	CleanToken()
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(result)
+
 }
