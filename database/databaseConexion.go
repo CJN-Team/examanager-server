@@ -13,7 +13,7 @@ import (
 var MongoConexion = ConnectBD()
 var clientOptions = options.Client().ApplyURI("mongodb+srv://" + os.Getenv("USER") + ":" + os.Getenv("PASSWORD") + "@examangerdb.1dbzg.mongodb.net/" + os.Getenv("DATABASE") + "?retryWrites=true&w=majority")
 
-//ConnectBD es la funcion que me permite conectarme con la base de datos
+//mongodb+srv://jmoralesm:examanager2020@examangerdb.1dbzg.mongodb.net/ExamangerDB?retryWrites=true&w=majority
 func ConnectBD() *mongo.Client {
 	client, error := mongo.Connect(context.TODO(), clientOptions)
 

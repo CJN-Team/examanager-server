@@ -17,7 +17,7 @@ func Manejadores() {
 
 	//Rutas para usuario
 	router.HandleFunc("/admin", middleware.DatabaseVerify(routers.CreateUser)).Methods("POST")
-	
+
 	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateUser))).Methods("POST")
 	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateUser))).Methods("PUT")
 	router.HandleFunc("/user", middleware.DatabaseVerify(middleware.ValidationJWT(routers.ReadUser))).Methods("GET")
@@ -57,6 +57,15 @@ func Manejadores() {
 
 	//Rutas Grupos
 	router.HandleFunc("/groups", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllGroups))).Methods("GET")
+
+	//Rutas departamento
+	router.HandleFunc("/departament", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateDepartment))).Methods("POST")
+	router.HandleFunc("/departament", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateDepartment))).Methods("PUT")
+	router.HandleFunc("/departament", middleware.DatabaseVerify(middleware.ValidationJWT(routers.ReadDepartment))).Methods("GET")
+	router.HandleFunc("/departament", middleware.DatabaseVerify(middleware.ValidationJWT(routers.DeleteDepartment))).Methods("DELETE")
+
+	//Rutas departamentos
+	router.HandleFunc("/departaments", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllDepartments))).Methods("GET")
 
 	//Rutas Examen
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateExam))).Methods("POST")
