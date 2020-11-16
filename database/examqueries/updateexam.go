@@ -71,3 +71,30 @@ func UpdateExam(exam models.Exam, ID string) (bool, error) {
 
 	return true, nil
 }
+
+//UpdateExamGrade actualiza la nota de un examen dado el ID del examen
+func UpdateExamGrade(examID string, grade float32)(bool, error){
+
+	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	database := dbConnection.MongoConexion.Database("examanager_db")
+
+	coleccion := database.Collection("GenerateExam")
+
+	updateString := bson.M{
+		"$set": bson.M{
+			"grade" : grade,
+		},
+	}
+
+	id, _ := primitive.ObjectIDFromHex(examID )
+	filter := bson.M{"_id": bson.M{"$eq": id}}
+
+	_, error := coleccion.UpdateOne(contex, filter, updateString)
+	
+	if error != nil {
+		return false, error
+	}
+	return true, nil
+}

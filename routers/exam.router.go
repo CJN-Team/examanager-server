@@ -110,3 +110,56 @@ func CreateGenerateExam(w http.ResponseWriter, r *http.Request) {
 	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
+
+//DeleteExam elimina el examen padre y todos los examenes generados a partir de este.
+func DeleteExam(w http.ResponseWriter, r *http.Request){
+	ID := r.URL.Query().Get("id")
+
+	if len(ID) < 1 {
+		http.Error(w, "Falta el parametro ID", http.StatusBadRequest)
+		return
+	}
+	_, err := database.DeleteExam(ID)
+	if err != nil{
+		http.Error(w, "Error al eliminar el examen: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	
+	_, err = database.DeleteGeneratedExams(ID)
+	if err != nil{
+		http.Error(w, "Error al eliminar el examen: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	CleanToken()
+	w.WriteHeader(http.StatusAccepted)
+}
+
+//UpdateExamGrade actualiza la nota de un examen generado
+func UpdateExamGrade(w http.ResponseWriter, r *http.Request){
+
+	var requestBody map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil{
+		http.Error(w, "Error en los datos recibidos", http.StatusBadRequest)
+		return
+	}
+
+	examID, exist := requestBody["examid"]
+	if !exist{
+		http.Error(w, "Falta el ID del examen a corregir", http.StatusBadRequest)
+		return
+	}
+
+	grade, exist := requestBody["grade"]
+	if !exist{
+		http.Error(w, "Falta la nueva nota del examen", http.StatusBadRequest)
+		return
+	}
+
+	if _, err := database.UpdateExamGrade(examID.(string), grade.(float32)); err != nil{
+		http.Error(w, "Error al corregir el examen: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusAccepted)
+}
