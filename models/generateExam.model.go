@@ -12,6 +12,7 @@ type GenerateExam struct {
 	Teacher     string             `bson:"teacher,omitempty" json:"teacher,omitempty"`
 	Student     string             `bson:"student,omitempty" json:"student,omitempty"`
 	Date        time.Time          `bson:"date,omitempty" json:"date,omitempty"`
+	Topic       string             `bson:"topic,omitempty" json:"topic,omitempty"`
 	Institution string             `bson:"institution,omitempty" json:"institution,omitempty"`
 	Photo       string             `bson:"photo,omitempty" json:"photo,omitempty"`
 	Name        string             `bson:"name,omitempty" json:"name,omitempty"`

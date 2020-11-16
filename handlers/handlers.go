@@ -70,9 +70,14 @@ func Manejadores() {
 	//Rutas Examen
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateExam))).Methods("POST")
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateGenerateExam))).Methods("PUT")
+<<<<<<< HEAD
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.DeleteExam))).Methods("DELETE")
 	router.HandleFunc("/generatedexam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateExamGrade))).Methods("PUT")
 	
+=======
+	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllExams))).Methods("GET")
+
+>>>>>>> 1dfde9d402809ee6c7c6f365fb11f0c339f74b4d
 	PORT := os.Getenv("PORT")
 
 	if PORT == "" {
