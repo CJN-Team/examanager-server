@@ -9,6 +9,7 @@ import (
 //Exam es una estructura basica para el manejo de los examenes
 type Exam struct {
 	ID            primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	MockExam      bool               `bson:"mockExam,omitempty" json:"mockExam,omitempty"`
 	Institution   string             `bson:"institution,omitempty" json:"institution,omitempty"`
 	SubjectID     string             `bson:"subjectID,omitempty" json:"subjectID"`
 	GroupID       string             `bson:"groupId,omitempty" json:"groupId"`

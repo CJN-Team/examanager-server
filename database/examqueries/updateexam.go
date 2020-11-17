@@ -27,7 +27,7 @@ func UpdateExam(exam models.Exam, ID string) (bool, error) {
 	}
 
 	if len(exam.GroupID) > 0 {
-		examRegisterd["groupID"] = exam.GroupID
+		examRegisterd["groupId"] = exam.GroupID
 	}
 
 	if len(exam.Name) > 0 {
@@ -61,9 +61,7 @@ func UpdateExam(exam models.Exam, ID string) (bool, error) {
 	id, _ := primitive.ObjectIDFromHex(ID)
 	filter := bson.M{"_id": bson.M{"$eq": id}}
 
-	a, error := coleccion.UpdateOne(contex, filter, updateString)
-
-	fmt.Println("eso ", a)
+	_, error := coleccion.UpdateOne(contex, filter, updateString)
 
 	if error != nil {
 		return false, error
@@ -72,27 +70,32 @@ func UpdateExam(exam models.Exam, ID string) (bool, error) {
 	return true, nil
 }
 
-//UpdateExamGrade actualiza la nota de un examen dado el ID del examen
-func UpdateExamGrade(examID string, grade float32)(bool, error){
-
+//UpdateGenerateExam actualiza algunos campos del examen generado
+func UpdateGenerateExam(exam models.GenerateExam, ID string) (bool, error) {
+	fmt.Println("hiiiiiii ")
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	database := dbConnection.MongoConexion.Database("examanager_db")
 
 	coleccion := database.Collection("GenerateExam")
+	examRegisterd := make(map[string]interface{})
 
-	updateString := bson.M{
-		"$set": bson.M{
-			"grade" : grade,
-		},
+	examRegisterd["grade"] = exam.Grade
+
+	if len(exam.Commentary) > 0 {
+		examRegisterd["commentary"] = exam.Commentary
 	}
 
-	id, _ := primitive.ObjectIDFromHex(examID )
+	updateString := bson.M{
+		"$set": examRegisterd,
+	}
+
+	id, _ := primitive.ObjectIDFromHex(ID)
 	filter := bson.M{"_id": bson.M{"$eq": id}}
 
 	_, error := coleccion.UpdateOne(contex, filter, updateString)
-	
+
 	if error != nil {
 		return false, error
 	}

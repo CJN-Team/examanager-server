@@ -46,6 +46,7 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 		generateExam.Teacher = group.Teacher
 		student, _ := userDB.GetUserByID(key)
 		generateExam.Student = student.Name + " " + student.LastName
+		generateExam.StudentID = student.ID
 		generateExam.Date = examModel.Date
 		generateExam.Topic = examModel.TopicQuestion
 		generateExam.InstitutionID = institution
@@ -63,6 +64,31 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 	}
 	grupDB.UpdateGroup(group, group.ID, loggedUser)
 	return ids, true, nil
+}
+
+//GenerateMockExam genera los examenes de prueba
+func GenerateMockExam(examModel models.Exam, loggedUser string, institution string) (string, bool, error) {
+	var generateExam models.GenerateExam
+	user, err := userDB.GetUserByID(loggedUser)
+	group, err := grupDB.GetGroupByID(examModel.GroupID, institution)
+
+	if err != nil {
+		return "", false, err
+	}
+	generateExam.Teacher = group.Teacher
+	generateExam.Student = user.Name + " " + user.LastName
+	generateExam.StudentID = user.ID
+	generateExam.Date = examModel.Date
+	generateExam.Topic = examModel.TopicQuestion
+	generateExam.InstitutionID = institution
+	institutionmodel, _, _ := institutionDB.GetInstitutionByID(user.Institution)
+	generateExam.InstitutionName = institutionmodel.Name
+	generateExam.Photo = user.Photo
+	generateExam.Name = examModel.Name
+	generateExam.Questions, _, _ = GetQuestions(examModel, institution)
+
+	id, _, _ := AddGenerateExam(generateExam)
+	return id, true, nil
 }
 
 //GetQuestions trae las preguntas necesarias para el examen

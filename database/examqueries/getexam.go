@@ -34,7 +34,7 @@ func GetExamByID(id string, institution string) (models.Exam, bool, string) {
 }
 
 //GetExamByName verifica si el examen ya existe por nombre
-func GetExamByName(name string, institution string) (models.Exam, bool, string) {
+func GetExamByName(name string, group string, institution string) (models.Exam, bool, string) {
 
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -42,7 +42,7 @@ func GetExamByName(name string, institution string) (models.Exam, bool, string) 
 	database := dbConnection.MongoConexion.Database("examanager_db")
 	coleccion := database.Collection("Exam")
 
-	condicion := bson.M{"name": name, "institution": institution}
+	condicion := bson.M{"name": name, "groupId":group, "institution": institution}
 
 	var result models.Exam
 
