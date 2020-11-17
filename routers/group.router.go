@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/CJN-Team/examanager-server/database/generatexamqueries"
 	database "github.com/CJN-Team/examanager-server/database/groupqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -139,7 +140,7 @@ func GetUserGrades(w http.ResponseWriter, r *http.Request) {
 	ID := r.URL.Query().Get("id")
 	GroupID := r.URL.Query().Get("group")
 
-	result, error := database.UserGradesAllGroups(ID, InstitutionID)
+	result, error := generatexamqueries.UserGrades(GroupID, ID, InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar las notas del usuario "+error.Error(), http.StatusBadRequest)
@@ -158,7 +159,7 @@ func GetUserGradesAllGroups(w http.ResponseWriter, r *http.Request) {
 
 	ID := r.URL.Query().Get("id")
 
-	result, error := database.UserGradesAllGroups(ID, InstitutionID)
+	result, error := generatexamqueries.UserGradesAllGroups(ID, InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar las notas del usuario "+error.Error(), http.StatusBadRequest)

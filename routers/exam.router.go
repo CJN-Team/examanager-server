@@ -8,7 +8,7 @@ import (
 	//"strconv"
 
 	database "github.com/CJN-Team/examanager-server/database/examqueries"
-	generateExam "github.com/CJN-Team/examanager-server/database/generateexamqueries"
+	generateExam "github.com/CJN-Team/examanager-server/database/generatexamqueries"
 
 	grupDB "github.com/CJN-Team/examanager-server/database/groupqueries"
 	"github.com/CJN-Team/examanager-server/models"
@@ -118,7 +118,7 @@ func CreateGenerateExam(w http.ResponseWriter, r *http.Request) {
 }
 
 //DeleteExam elimina el examen padre y todos los examenes generados a partir de este.
-func DeleteExam(w http.ResponseWriter, r *http.Request){
+func DeleteExam(w http.ResponseWriter, r *http.Request) {
 	ID := r.URL.Query().Get("id")
 
 	if len(ID) < 1 {
@@ -126,13 +126,13 @@ func DeleteExam(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	_, err := database.DeleteExam(ID)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Error al eliminar el examen: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
 	_, err = database.DeleteGeneratedExams(ID)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Error al eliminar el examen: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -142,27 +142,27 @@ func DeleteExam(w http.ResponseWriter, r *http.Request){
 }
 
 //UpdateExamGrade actualiza la nota de un examen generado
-func UpdateExamGrade(w http.ResponseWriter, r *http.Request){
+func UpdateExamGrade(w http.ResponseWriter, r *http.Request) {
 
 	var requestBody map[string]interface{}
-	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil{
+	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 		http.Error(w, "Error en los datos recibidos", http.StatusBadRequest)
 		return
 	}
 
 	examID, exist := requestBody["examid"]
-	if !exist{
+	if !exist {
 		http.Error(w, "Falta el ID del examen a corregir", http.StatusBadRequest)
 		return
 	}
 
 	grade, exist := requestBody["grade"]
-	if !exist{
+	if !exist {
 		http.Error(w, "Falta la nueva nota del examen", http.StatusBadRequest)
 		return
 	}
 
-	if _, err := database.UpdateExamGrade(examID.(string), grade.(float32)); err != nil{
+	if _, err := database.UpdateExamGrade(examID.(string), grade.(float32)); err != nil {
 		http.Error(w, "Error al corregir el examen: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -207,6 +207,7 @@ func GetAllExams(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 
 }
+
 //GetGenerateExam permite tomar todos los examenes de un grupo
 func GetGenerateExam(w http.ResponseWriter, r *http.Request) {
 	ID := r.URL.Query().Get("id")
@@ -216,7 +217,7 @@ func GetGenerateExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, correct := generateExam.GetGenerateExamByID(ID,InstitutionID)
+	result, correct := generateExam.GetGenerateExamByID(ID, InstitutionID)
 
 	if correct == false {
 		http.Error(w, "Error al buscar el examen", http.StatusBadRequest)
