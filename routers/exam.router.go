@@ -207,3 +207,24 @@ func GetAllExams(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 
 }
+//GetGenerateExam permite tomar todos los examenes de un grupo
+func GetGenerateExam(w http.ResponseWriter, r *http.Request) {
+	ID := r.URL.Query().Get("id")
+
+	if len(ID) < 1 {
+		http.Error(w, "Falta el parametro id", http.StatusBadRequest)
+		return
+	}
+
+	result, correct := generateExam.GetGenerateExamByID(ID,InstitutionID)
+
+	if correct == false {
+		http.Error(w, "Error al buscar el examen", http.StatusBadRequest)
+		return
+	}
+	CleanToken()
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(result)
+}

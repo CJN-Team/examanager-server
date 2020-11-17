@@ -48,8 +48,9 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 		generateExam.Student = student.Name + " " + student.LastName
 		generateExam.Date = examModel.Date
 		generateExam.Topic = examModel.TopicQuestion
+		generateExam.InstitutionID = institution
 		institution, _, _ := institutionDB.GetInstitutionByID(student.Institution)
-		generateExam.Institution = institution.Name
+		generateExam.InstitutionName = institution.Name
 		generateExam.Photo = student.Photo
 		generateExam.Name = examModel.Name
 		generateExam.Questions, _, _ = GetQuestions(examModel, student.Institution)

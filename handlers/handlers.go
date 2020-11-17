@@ -75,6 +75,7 @@ func Manejadores() {
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.DeleteExam))).Methods("DELETE")
 	router.HandleFunc("/generatedexam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateExamGrade))).Methods("PUT")
 
+	router.HandleFunc("/generatedexam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetGenerateExam))).Methods("GET")
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllExams))).Methods("GET")
 
 	PORT := os.Getenv("PORT")
