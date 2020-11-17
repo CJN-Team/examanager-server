@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/CJN-Team/examanager-server/database/generatexamqueries"
 	database "github.com/CJN-Team/examanager-server/database/groupqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -104,6 +105,64 @@ func GetAllGroups(w http.ResponseWriter, r *http.Request) {
 
 	if correct == false {
 		http.Error(w, "Error al leer los grupos", http.StatusBadRequest)
+		return
+	}
+	CleanToken()
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(result)
+
+}
+
+//GetAllWatchedTopics permite visualizar los temas vistos en un grupo
+func GetAllWatchedTopics(w http.ResponseWriter, r *http.Request) {
+
+	ID := r.URL.Query().Get("id")
+
+	result, error := database.WatchedTopics(ID, InstitutionID)
+
+	if error != nil {
+		http.Error(w, "Ocurrio un error al intentar buscar los temas vistos"+error.Error(), http.StatusBadRequest)
+		return
+	}
+	CleanToken()
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(result)
+
+}
+
+//GetUserGrades permite visualizar las notas de un usuario
+func GetUserGrades(w http.ResponseWriter, r *http.Request) {
+
+	ID := r.URL.Query().Get("id")
+	GroupID := r.URL.Query().Get("group")
+
+	result, error := generatexamqueries.UserGrades(GroupID, ID, InstitutionID)
+
+	if error != nil {
+		http.Error(w, "Ocurrio un error al intentar las notas del usuario "+error.Error(), http.StatusBadRequest)
+		return
+	}
+	CleanToken()
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(result)
+
+}
+
+//GetUserGradesAllGroups permite visualizar las notas de un usuario en todos sus grupos
+func GetUserGradesAllGroups(w http.ResponseWriter, r *http.Request) {
+
+	ID := r.URL.Query().Get("id")
+
+	result, error := generatexamqueries.UserGradesAllGroups(ID, InstitutionID)
+
+	if error != nil {
+		http.Error(w, "Ocurrio un error al intentar las notas del usuario "+error.Error(), http.StatusBadRequest)
 		return
 	}
 	CleanToken()

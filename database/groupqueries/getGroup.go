@@ -2,12 +2,17 @@ package groupqueries
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 	"time"
 
 	dbConnection "github.com/CJN-Team/examanager-server/database"
+	"github.com/CJN-Team/examanager-server/database/examqueries"
+	"github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -72,3 +77,48 @@ func GetGroupByID(ID string, institution string) (models.Group, error) {
 
 	return result, nil
 }
+
+//WatchedTopics se encarga de mostrar cuales temas fueron vistos en el grupo
+func WatchedTopics(ID string, institution string) (map[string]bool, error) {
+
+	examsmodels, find := examqueries.GetAllExamByGroup(ID, institution, -1)
+
+	result := make(map[string]bool)
+
+	if !find {
+		error := errors.New("No hay examenes asociados a el grupo")
+		return result, error
+	}
+
+	groupModel, error := GetGroupByID(ID, institution)
+
+	if error != nil {
+		return result, error
+	}
+
+	institutionInfo, found, error := institutionsqueries.GetInstitutionByID(institution)
+
+	if error != nil {
+		error := errors.New("No se pudo obtener la institucion asociada")
+		return result, error
+	}
+
+	if !found {
+		error := errors.New("No existe institucion asociada")
+		return result, error
+	}
+
+	subject, found := institutionInfo.Subjetcs[groupModel.Subject]
+
+	for _, value := range subject.(primitive.A) {
+		fmt.Println(value)
+		result[value.(string)] = false
+	}
+	for _, value := range examsmodels {
+
+		result[value.TopicQuestion] = true
+	}
+
+	return result, nil
+}
+

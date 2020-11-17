@@ -71,8 +71,12 @@ func GetAllExamByGroup(groupID string, institution string, page int64) ([]*model
 	var result []*models.Exam
 
 	searchOptions := options.Find()
-	searchOptions.SetLimit(20)
-	searchOptions.SetSkip((page - 1) * 20)
+
+	if page != -1 {
+
+		searchOptions.SetLimit(20)
+		searchOptions.SetSkip((page - 1) * 20)
+	}
 
 	pointer, error := coleccion.Find(contex, condicion, searchOptions)
 

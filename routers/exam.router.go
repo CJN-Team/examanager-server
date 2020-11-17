@@ -8,7 +8,7 @@ import (
 	//"strconv"
 
 	database "github.com/CJN-Team/examanager-server/database/examqueries"
-	generateExam "github.com/CJN-Team/examanager-server/database/generateexamqueries"
+	generateExam "github.com/CJN-Team/examanager-server/database/generatexamqueries"
 
 	grupDB "github.com/CJN-Team/examanager-server/database/groupqueries"
 	"github.com/CJN-Team/examanager-server/models"

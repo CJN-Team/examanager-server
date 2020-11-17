@@ -57,6 +57,9 @@ func Manejadores() {
 
 	//Rutas Grupos
 	router.HandleFunc("/groups", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllGroups))).Methods("GET")
+	router.HandleFunc("/groupProgress", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllWatchedTopics))).Methods("GET")
+	router.HandleFunc("/groupUserGradesAll", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetUserGradesAllGroups))).Methods("GET")
+	router.HandleFunc("/groupUserGrades", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetUserGrades))).Methods("GET")
 
 	//Rutas departamento
 	router.HandleFunc("/departament", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateDepartment))).Methods("POST")
@@ -72,6 +75,7 @@ func Manejadores() {
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateGenerateExam))).Methods("PUT")
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.DeleteExam))).Methods("DELETE")
 	router.HandleFunc("/generatedexam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateExamGrade))).Methods("PUT")
+
 	router.HandleFunc("/generatedexam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetGenerateExam))).Methods("GET")
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllExams))).Methods("GET")
 
