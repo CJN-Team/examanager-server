@@ -43,6 +43,7 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 		return ids, false, err
 	}
 	for key, value := range group.StudentsList {
+		generateExam.MockExam = examModel.MockExam
 		generateExam.Teacher = group.Teacher
 		student, _ := userDB.GetUserByID(key)
 		generateExam.Student = student.Name + " " + student.LastName
@@ -75,6 +76,7 @@ func GenerateMockExam(examModel models.Exam, loggedUser string, institution stri
 	if err != nil {
 		return "", false, err
 	}
+	generateExam.MockExam = examModel.MockExam
 	generateExam.Teacher = group.Teacher
 	generateExam.Student = user.Name + " " + user.LastName
 	generateExam.StudentID = user.ID

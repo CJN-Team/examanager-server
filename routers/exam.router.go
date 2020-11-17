@@ -94,25 +94,42 @@ func CreateGenerateExam(w http.ResponseWriter, r *http.Request) {
 	}
 
 	exam, _, _ := database.GetExamByID(ID, InstitutionID)
+	if !exam.MockExam {
 
-	if len(exam.GenerateExam) != 0 {
-		http.Error(w, "ya se han generado los examenes de este modelo", 400)
-		return
+		if len(exam.GenerateExam) != 0 {
+			http.Error(w, "ya se han generado los examenes de este modelo", 400)
+			return
+		}
+
+		ids, status, error := generateExam.GenerateExam(exam, IDUser, InstitutionID)
+
+		exam.GenerateExam = ids
+		if error != nil {
+			http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
+			return
+		}
+
+		if status == false {
+			http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
+			return
+		}
+		status, error = database.UpdateExam(exam, ID)
+	} else {
+		id, status, error := generateExam.GenerateMockExam(exam, IDUser, InstitutionID)
+
+		exam.GenerateExam = append(exam.GenerateExam, id)
+		if error != nil {
+			http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
+			return
+		}
+
+		if status == false {
+			http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
+			return
+		}
+		status, error = database.UpdateExam(exam, ID)
 	}
 
-	ids, status, error := generateExam.GenerateExam(exam, IDUser, InstitutionID)
-
-	exam.GenerateExam = ids
-	if error != nil {
-		http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
-		return
-	}
-
-	if status == false {
-		http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
-		return
-	}
-	status, error = database.UpdateExam(exam, ID)
 	CleanToken()
 	w.WriteHeader(http.StatusCreated)
 }
