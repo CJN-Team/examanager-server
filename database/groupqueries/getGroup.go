@@ -2,12 +2,17 @@ package groupqueries
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 	"time"
 
 	dbConnection "github.com/CJN-Team/examanager-server/database"
+	"github.com/CJN-Team/examanager-server/database/examqueries"
+	"github.com/CJN-Team/examanager-server/database/institutionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -71,4 +76,113 @@ func GetGroupByID(ID string, institution string) (models.Group, error) {
 	}
 
 	return result, nil
+}
+
+//WatchedTopics se encarga de mostrar cuales temas fueron vistos en el grupo
+func WatchedTopics(ID string, institution string) (map[string]bool, error) {
+
+	examsmodels, find := examqueries.GetAllExamByGroup(ID, institution, -1)
+
+	result := make(map[string]bool)
+
+	if !find {
+		error := errors.New("No hay examenes asociados a el grupo")
+		return result, error
+	}
+
+	groupModel, error := GetGroupByID(ID, institution)
+
+	if error != nil {
+		return result, error
+	}
+
+	institutionInfo, found, error := institutionsqueries.GetInstitutionByID(institution)
+
+	if error != nil {
+		error := errors.New("No se pudo obtener la institucion asociada")
+		return result, error
+	}
+
+	if !found {
+		error := errors.New("No existe institucion asociada")
+		return result, error
+	}
+
+	subject, found := institutionInfo.Subjetcs[groupModel.Subject]
+
+	for _, value := range subject.(primitive.A) {
+		fmt.Println(value)
+		result[value.(string)] = false
+	}
+	for _, value := range examsmodels {
+
+		result[value.TopicQuestion] = true
+	}
+
+	return result, nil
+}
+
+//UserGrades se encarga de mostrar las notas de un alumno
+func UserGrades(GroupID string, UserID string, institution string) {
+	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	database := dbConnection.MongoConexion.Database("examanager_db")
+
+	coleccion := database.Collection("groups")
+
+	var result models.Group
+
+	condicion := bson.M{"_id": GroupID, "institution": institution}
+
+	error := coleccion.FindOne(contex, condicion).Decode(&result)
+
+	if error != nil {
+		return result, error
+	}
+
+	return result, nil
+}
+
+//UserGradesAllGroups se encarga de mostrar las notas de un alumno
+func UserGradesAllGroups(UserID string, institution string) (map[string][]string, error) {
+
+	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	database := dbConnection.MongoConexion.Database("examanager_db")
+
+	coleccion := database.Collection("groups")
+
+	condicion := bson.M{"institution": institution}
+
+	searchOptions := options.Find()
+
+	pointer, error := coleccion.Find(contex, condicion, searchOptions)
+
+	grades := make(map[string][]string)
+
+	for pointer.Next(context.TODO()) {
+		var register models.Group
+		error := pointer.Decode(&register)
+
+		if error != nil {
+			return grades, error
+		}
+
+		if _, ok := register.StudentsList[UserID]; ok {
+
+			for _, value := range register.StudentsList[UserID].(primitive.A) {
+				grades[register.ID] = append(grades[register.ID], value.(string))
+			}
+
+		}
+
+	}
+
+	if error != nil {
+		return grades, error
+	}
+
+	return grades, nil
 }

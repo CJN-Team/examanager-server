@@ -114,6 +114,64 @@ func GetAllGroups(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//GetAllWatchedTopics permite visualizar los temas vistos en un grupo
+func GetAllWatchedTopics(w http.ResponseWriter, r *http.Request) {
+
+	ID := r.URL.Query().Get("id")
+
+	result, error := database.WatchedTopics(ID, InstitutionID)
+
+	if error != nil {
+		http.Error(w, "Ocurrio un error al intentar buscar los temas vistos"+error.Error(), http.StatusBadRequest)
+		return
+	}
+	CleanToken()
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(result)
+
+}
+
+//GetUserGrades permite visualizar las notas de un usuario
+func GetUserGrades(w http.ResponseWriter, r *http.Request) {
+
+	ID := r.URL.Query().Get("id")
+	GroupID := r.URL.Query().Get("group")
+
+	result, error := database.UserGradesAllGroups(ID, InstitutionID)
+
+	if error != nil {
+		http.Error(w, "Ocurrio un error al intentar las notas del usuario "+error.Error(), http.StatusBadRequest)
+		return
+	}
+	CleanToken()
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(result)
+
+}
+
+//GetUserGradesAllGroups permite visualizar las notas de un usuario en todos sus grupos
+func GetUserGradesAllGroups(w http.ResponseWriter, r *http.Request) {
+
+	ID := r.URL.Query().Get("id")
+
+	result, error := database.UserGradesAllGroups(ID, InstitutionID)
+
+	if error != nil {
+		http.Error(w, "Ocurrio un error al intentar las notas del usuario "+error.Error(), http.StatusBadRequest)
+		return
+	}
+	CleanToken()
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(result)
+
+}
+
 //DeleteGroup elimina el grupo seleccionado
 func DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	ID := r.URL.Query().Get("id")
