@@ -2,7 +2,6 @@ package examqueries
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	dbConnection "github.com/CJN-Team/examanager-server/database"
@@ -34,11 +33,9 @@ func UpdateExam(exam models.Exam, ID string) (bool, error) {
 		examRegisterd["name"] = exam.Name
 	}
 
-	if exam.State {
-		examRegisterd["state"] = exam.State
-	} else {
-		examRegisterd["state"] = exam.State
-	}
+	examRegisterd["state"] = exam.State
+
+	examRegisterd["view"] = exam.View
 
 	if len(exam.Difficulty) > 0 {
 		examRegisterd["difficulty"] = exam.Difficulty
@@ -72,7 +69,6 @@ func UpdateExam(exam models.Exam, ID string) (bool, error) {
 
 //UpdateGenerateExam actualiza algunos campos del examen generado
 func UpdateGenerateExam(exam models.GenerateExam, ID string) (bool, error) {
-	fmt.Println("hiiiiiii ")
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -82,6 +78,8 @@ func UpdateGenerateExam(exam models.GenerateExam, ID string) (bool, error) {
 	examRegisterd := make(map[string]interface{})
 
 	examRegisterd["grade"] = exam.Grade
+
+	examRegisterd["finish"] = exam.Finish
 
 	if len(exam.Commentary) > 0 {
 		examRegisterd["commentary"] = exam.Commentary

@@ -158,6 +158,43 @@ func DeleteExam(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
+//UpdateExam actualiza la nota de un examen generado
+func UpdateExam(w http.ResponseWriter, r *http.Request) {
+	var exam models.Exam
+
+	error := json.NewDecoder(r.Body).Decode(&exam)
+
+	if error != nil {
+		http.Error(w, "Datos Incorrectos"+error.Error(), 400)
+		return
+	}
+
+	id := r.URL.Query().Get("id")
+
+	if len(id) < 1 {
+		http.Error(w, "Debe enviar el examen a buscar", http.StatusBadRequest)
+		return
+	}
+
+	if IDUser == "" {
+		http.Error(w, "Debes estar logueado", http.StatusBadRequest)
+		return
+	}
+	status, error := database.UpdateExam(exam, id)
+
+	if error != nil {
+		http.Error(w, "Ocurrio un error al intentar modificar el registro"+error.Error(), 400)
+		return
+	}
+
+	if status == false {
+		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
+		return
+	}
+	CleanToken()
+	w.WriteHeader(http.StatusCreated)
+}
+
 //UpdateExamGrade actualiza la nota de un examen generado
 func UpdateExamGrade(w http.ResponseWriter, r *http.Request) {
 	var exam models.GenerateExam

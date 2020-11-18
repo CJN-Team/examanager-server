@@ -72,12 +72,12 @@ func Manejadores() {
 
 	//Rutas Examen
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateExam))).Methods("POST")
-	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateGenerateExam))).Methods("PUT")
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.DeleteExam))).Methods("DELETE")
-	router.HandleFunc("/generatedexam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateExamGrade))).Methods("PUT")
-
-	router.HandleFunc("/generatedexam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetGenerateExam))).Methods("GET")
+	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateExam))).Methods("PUT")
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllExams))).Methods("GET")
+	router.HandleFunc("/generatedexam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateExamGrade))).Methods("PUT")
+	router.HandleFunc("/generatedexam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetGenerateExam))).Methods("GET")
+	router.HandleFunc("/examgenerator", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateGenerateExam))).Methods("PUT")
 
 	PORT := os.Getenv("PORT")
 
