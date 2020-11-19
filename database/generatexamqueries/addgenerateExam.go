@@ -98,8 +98,8 @@ func GenerateMockExam(examModel models.Exam, loggedUser string, institution stri
 }
 
 //GetQuestions trae las preguntas necesarias para el examen
-func GetQuestions(examModel models.Exam, institution string) (map[string]float32, bool, error) {
-	questions := make(map[string]float32)
+func GetQuestions(examModel models.Exam, institution string) (map[string]float64, bool, error) {
+	questions := make(map[string]float64)
 	var random int
 	questionsFacil, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "1", 3, -1, institution)
 	questionsNormal, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "2", 3, -1, institution)

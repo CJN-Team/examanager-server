@@ -22,7 +22,7 @@ type GenerateExam struct {
 	InstitutionName string             `bson:"institutionname,omitempty" json:"institutionname,omitempty"`
 	Photo           string             `bson:"photo,omitempty" json:"photo,omitempty"`
 	Name            string             `bson:"name,omitempty" json:"name,omitempty"`
-	Grade           float32            `bson:"grade" json:"grade"`
+	Grade           float64            `bson:"grade" json:"grade"`
 	Commentary      string             `bson:"commentary,omitempty" json:"commentary,omitempty"`
-	Questions       map[string]float32 `bson:"question,omitempty" json:"question,omitempty"`
+	Questions       map[string]float64 `bson:"question,omitempty" json:"question,omitempty"`
 }

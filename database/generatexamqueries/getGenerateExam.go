@@ -2,7 +2,6 @@ package generatexamqueries
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	dbConnection "github.com/CJN-Team/examanager-server/database"
@@ -34,7 +33,7 @@ func GetGenerateExamByID(id string, institution string) (models.GenerateExam, bo
 //Cosas de James No tocar
 
 //UserGrades se encarga de mostrar las notas de un alumno
-func UserGrades(GroupID string, UserID string, institution string) (map[string][]float32, error) {
+func UserGrades(GroupID string, UserID string, institution string) (map[string]float64, error) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -42,8 +41,7 @@ func UserGrades(GroupID string, UserID string, institution string) (map[string][
 
 	coleccion := database.Collection("groups")
 
-	grades := make(map[string][]float32)
-
+	gradesAux := make(map[string]float64)
 	var groupModel models.Group
 
 	condicion := bson.M{"_id": GroupID, "institution": institution}
@@ -52,19 +50,20 @@ func UserGrades(GroupID string, UserID string, institution string) (map[string][
 
 	for _, value := range groupModel.StudentsList[UserID].(primitive.A) {
 		currentExam, _ := GetGenerateExamByID(value.(string), institution)
-		fmt.Println(currentExam.Grade)
-		grades[GroupID] = append(grades[GroupID], currentExam.Grade)
+
+		gradesAux[currentExam.Name] = currentExam.Grade
+
 	}
 
 	if error != nil {
-		return grades, error
+		return gradesAux, error
 	}
 
-	return grades, nil
+	return gradesAux, nil
 }
 
 //UserGradesAllGroups se encarga de mostrar las notas de un alumno
-func UserGradesAllGroups(UserID string, institution string) (map[string][]float32, error) {
+func UserGradesAllGroups(UserID string, institution string) (map[string]map[string]float64, error) {
 
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -79,8 +78,8 @@ func UserGradesAllGroups(UserID string, institution string) (map[string][]float3
 
 	pointer, error := coleccion.Find(contex, condicion, searchOptions)
 
-	grades := make(map[string][]float32)
-
+	grades := make(map[string]map[string]float64)
+	gradesAux := make(map[string]float64)
 	for pointer.Next(context.TODO()) {
 		var register models.Group
 		error := pointer.Decode(&register)
@@ -94,11 +93,11 @@ func UserGradesAllGroups(UserID string, institution string) (map[string][]float3
 			for _, value := range register.StudentsList[UserID].(primitive.A) {
 
 				currentExam, _ := GetGenerateExamByID(value.(string), institution)
-				fmt.Println(currentExam.Grade)
-				grades[register.ID] = append(grades[register.ID], currentExam.Grade)
+
+				gradesAux[currentExam.Name] = currentExam.Grade
 
 			}
-
+			grades[register.ID+","+register.Name] = gradesAux
 		}
 
 	}
