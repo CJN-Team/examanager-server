@@ -9,6 +9,8 @@ import (
 //GenerateExam es la estructura paralos examenes de cada estudiante
 type GenerateExam struct {
 	ID              primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	View            bool               `bson:"view,omitempty" json:"view,omitempty"`
+	State           bool               `bson:"state,omitempty" json:"state,omitempty"`
 	MockExam        bool               `bson:"mockExam,omitempty" json:"mockExam,omitempty"`
 	Finish          bool               `bson:"finish,omitempty" json:"finish,omitempty"`
 	Teacher         string             `bson:"teacher,omitempty" json:"teacher,omitempty"`

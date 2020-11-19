@@ -11,10 +11,10 @@ import (
 )
 
 //UpdateExam se encarga de actualizar la informacion de la pregunta
-func UpdateExam(exam models.Exam, ID string) (bool, error) {
+func UpdateExam(exam models.Exam, ID string, institution string) (bool, error) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-
+	exampadre, _, _ := GetExamByID(ID, institution)
 	database := dbConnection.MongoConexion.Database("examanager_db")
 
 	coleccion := database.Collection("Exam")
@@ -36,6 +36,12 @@ func UpdateExam(exam models.Exam, ID string) (bool, error) {
 	examRegisterd["state"] = exam.State
 
 	examRegisterd["view"] = exam.View
+	for i := 0; i < len(exampadre.GenerateExam); i++ {
+		generate, _ := getGenerateExamByID(exampadre.GenerateExam[i], institution)
+		generate.View = exam.View
+		generate.State = exam.State
+		UpdateGenerateExam(generate, generate.ID.Hex())
+	}
 
 	if len(exam.Difficulty) > 0 {
 		examRegisterd["difficulty"] = exam.Difficulty
@@ -71,7 +77,6 @@ func UpdateExam(exam models.Exam, ID string) (bool, error) {
 func UpdateGenerateExam(exam models.GenerateExam, ID string) (bool, error) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-
 	database := dbConnection.MongoConexion.Database("examanager_db")
 
 	coleccion := database.Collection("GenerateExam")
@@ -80,6 +85,10 @@ func UpdateGenerateExam(exam models.GenerateExam, ID string) (bool, error) {
 	examRegisterd["grade"] = exam.Grade
 
 	examRegisterd["finish"] = exam.Finish
+
+	examRegisterd["view"] = exam.View
+
+	examRegisterd["state"] = exam.State
 
 	if len(exam.Commentary) > 0 {
 		examRegisterd["commentary"] = exam.Commentary
@@ -98,4 +107,22 @@ func UpdateGenerateExam(exam models.GenerateExam, ID string) (bool, error) {
 		return false, error
 	}
 	return true, nil
+}
+
+func getGenerateExamByID(id string, institution string) (models.GenerateExam, bool) {
+
+	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	database := dbConnection.MongoConexion.Database("examanager_db")
+	coleccion := database.Collection("GenerateExam")
+	var result models.GenerateExam
+	idaux, _ := primitive.ObjectIDFromHex(id)
+	error := coleccion.FindOne(contex, bson.M{"_id": idaux, "institutionid": institution}).Decode(&result)
+
+	if error != nil {
+		return result, false
+	}
+
+	return result, true
 }
