@@ -113,7 +113,7 @@ func CreateGenerateExam(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
 			return
 		}
-		status, error = database.UpdateExam(exam, ID)
+		status, error = database.UpdateExam(exam, ID, InstitutionID)
 	} else {
 		id, status, error := generateExam.GenerateMockExam(exam, IDUser, InstitutionID)
 
@@ -127,7 +127,7 @@ func CreateGenerateExam(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
 			return
 		}
-		status, error = database.UpdateExam(exam, ID)
+		status, error = database.UpdateExam(exam, ID, InstitutionID)
 	}
 
 	CleanToken()
@@ -180,7 +180,7 @@ func UpdateExam(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Debes estar logueado", http.StatusBadRequest)
 		return
 	}
-	status, error := database.UpdateExam(exam, id)
+	status, error := database.UpdateExam(exam, id, InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar modificar el registro"+error.Error(), 400)
