@@ -79,7 +79,7 @@ func UserGradesAllGroups(UserID string, institution string) (map[string]map[stri
 	pointer, error := coleccion.Find(contex, condicion, searchOptions)
 
 	grades := make(map[string]map[string]float64)
-	gradesAux := make(map[string]float64)
+
 	for pointer.Next(context.TODO()) {
 		var register models.Group
 		error := pointer.Decode(&register)
@@ -89,7 +89,7 @@ func UserGradesAllGroups(UserID string, institution string) (map[string]map[stri
 		}
 
 		if _, ok := register.StudentsList[UserID]; ok {
-
+			gradesAux := make(map[string]float64)
 			for _, value := range register.StudentsList[UserID].(primitive.A) {
 
 				currentExam, _ := GetGenerateExamByID(value.(string), institution)
