@@ -12,7 +12,7 @@ import (
 )
 
 //UpdateUser se encarga de actualizar el usuario registrado
-func UpdateUser(user models.User, ID string, loggedUser string,loggedInstitution string) (bool, error) {
+func UpdateUser(user models.User, ID string, loggedUser string, loggedInstitution string) (bool, error) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -72,14 +72,14 @@ func UpdateUser(user models.User, ID string, loggedUser string,loggedInstitution
 		"$set": userRegisterd,
 	}
 
-	if userTypeVerificationdeleting(loggedUser,loggedInstitution) {
+	if userTypeVerificationdeleting(loggedUser, loggedInstitution) {
 		error := errors.New("el usuario no posee los permisos suficientes")
 		return false, error
 	}
 
 	fmt.Println(ID)
 
-	filter := bson.M{"_id": bson.M{"$eq": ID},"institution":bson.M{"$eq": ID}}
+	filter := bson.M{"_id": bson.M{"$eq": ID}, "institution": bson.M{"$eq": loggedInstitution}}
 
 	_, error := coleccion.UpdateOne(contex, filter, updateString)
 
@@ -90,9 +90,9 @@ func UpdateUser(user models.User, ID string, loggedUser string,loggedInstitution
 	return true, nil
 }
 
-func userTypeVerificationUpdating(loggedUser string,loggedInstitution string) bool {
+func userTypeVerificationUpdating(loggedUser string, loggedInstitution string) bool {
 
-	userID, _ := GetUserByIDOneInstitution(loggedUser,loggedInstitution)
+	userID, _ := GetUserByIDOneInstitution(loggedUser, loggedInstitution)
 
 	if userID.Profile != "Administrador" {
 		return true
