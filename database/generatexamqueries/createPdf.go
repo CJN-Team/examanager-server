@@ -1,13 +1,17 @@
 package generatexamqueries
 
 import (
+	"context"
 	"log"
 	"strconv"
+	"time"
 
 	//dbExam"github.com/CJN-Team/examanager-server/database/examqueries"
+	dbConnection "github.com/CJN-Team/examanager-server/database"
 	questionsDB "github.com/CJN-Team/examanager-server/database/questionsqueries"
 	"github.com/CJN-Team/examanager-server/models"
 	"github.com/signintech/gopdf"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // CreatePDF creara los pdf de los examenes
@@ -30,7 +34,8 @@ func CreatePDF(exams models.Exam, institution string) {
 		pdf.AddPage()
 		x, y := 30.0, 40.0
 		generate, _ := GetGenerateExamByID(exams.GenerateExam[i], institution)
-		pdf.Image("assets/users/" + generate.StudentID , 200, 50, nil)
+		user, _ := getUserByIDOneInstitution(generate.StudentID, institution)
+		pdf.Image("assets/users/"+user.Photo, 300, 10, nil)
 		pdf.SetX(x)
 		pdf.SetY(y)
 		pdf.Text(generate.InstitutionName)
@@ -101,4 +106,31 @@ func CreatePDF(exams models.Exam, institution string) {
 	name := exams.ID.Hex()
 
 	pdf.WritePdf("exam-pdf/" + name + ".pdf")
+}
+
+//GetUserByIDOneInstitution se encarga de buscar en la base de datos el usuario que posee la ID asignada en una sola institucion
+func getUserByIDOneInstitution(ID string, institution string) (models.User, error) {
+
+	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	database := dbConnection.MongoConexion.Database("examanager_db")
+
+	coleccion := database.Collection("users")
+
+	var result models.User
+
+	ObjectID := ID
+
+	condicion := bson.M{"_id": ObjectID, "institution": institution}
+
+	error := coleccion.FindOne(contex, condicion).Decode(&result)
+
+	result.Password = ""
+
+	if error != nil {
+		return result, error
+	}
+
+	return result, nil
 }
