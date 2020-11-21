@@ -388,11 +388,20 @@ func GradeExam(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	
-
 	examid, found := requestBody["examid"].(string)
 	if !found{
 		http.Error(w, "Debe especificar el ID del examen", http.StatusBadRequest)
+		return
+	}
+
+	option, found := requestBody["option"].(string)
+	if !found{
+		http.Error(w, "Debe especificar una opcion para calificacion", http.StatusBadRequest)
+		return
+	}
+
+	if option == "manual"{
+		GradeOpenQuestion(w, r, requestBody, examid)
 		return
 	}
 
@@ -402,7 +411,6 @@ func GradeExam(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	
-
 	var generatedExam models.GenerateExam
 	generatedExam, found = generateExam.GetGenerateExamByID(examid,InstitutionID)
 	if !found{
@@ -490,6 +498,7 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 			}
 		}else if question.Category == "Pregunta abierta"{
 			questionsMap[key] = []interface{}{0.0,userAnswer,[]string{""}}
+			quantity--
 		}
 	}
 	grade /= float64(quantity)
@@ -502,4 +511,59 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 	}
 
 	return updateString, ""
+}
+
+//GradeOpenQuestion le permite al profesor calificar las preguntas abiertas
+func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[string]interface{}, examid string){
+
+	teacherGrades, found := requestBody["questions"].(map[string]interface{})
+	if !found{
+		http.Error(w, "Debe especificar las preguntas", http.StatusBadRequest)
+		return
+	}
+	
+	var generatedExam models.GenerateExam
+	generatedExam, found = generateExam.GetGenerateExamByID(examid,InstitutionID)
+	if !found{
+		http.Error(w, "El examen no existe en esta institucion", http.StatusBadRequest)
+		return
+	}
+
+	updateString := bson.M{}
+	questionsMap := make(map[string]interface{})
+	grade := 0.0
+	quantity := 0
+
+	examQuestions := generatedExam.Questions
+	for key := range(examQuestions){
+		quantity++
+
+		teacherGrade,found := teacherGrades[key].(float64)
+		if !found{
+			http.Error(w, "Esta pregunta no existe en este cuestionario ", http.StatusBadRequest)
+			return
+		}
+
+		questionsMap[key] = examQuestions[key]
+		questionsMap[key].([]interface{})[0] = teacherGrade		
+		grade+=teacherGrade
+	}
+	grade = generatedExam.Grade + (grade/float64(quantity))
+	updateString = bson.M{
+		"$set" : bson.M{
+			"grade" : grade,
+			"question" : questionsMap,
+			"finish" : true,
+		},
+	}
+	
+
+	err := generateExam.UpdateExam(examid,updateString)
+	if err != nil{
+		http.Error(w, "Error al calificar el examen" + err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	CleanToken()
+	w.WriteHeader(http.StatusAccepted)
 }
