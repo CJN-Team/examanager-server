@@ -442,14 +442,19 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 		if err != nil{
 			return updateString, "Error al buscar la pregunta en la base de datos: " + err.Error()
 		}
-		
-		userAnswer := userAnswers[key].([]interface{})
+
+		userAnswer,found := userAnswers[key].([]interface{})
+		if !found{
+			quantity++
+			continue
+		}
+
 		if question.Category == "Respuesta única" ||  question.Category == "Verdadero o falso"{
 
-			userOption := []string{question.Options[question.Answer[0]]}
+			userOption := []string{question.Options[int(userAnswer[0].(float64))]}
 			examCorrectOption := []string{question.Options[question.Answer[0]]}
 
-			if userAnswer[0].(int) == question.Answer[0]{
+			if int(userAnswer[0].(float64)) == question.Answer[0]{
 				questionsMap[key] = []interface{}{5.0,userOption,examCorrectOption}
 				grade+=5.0
 
@@ -464,12 +469,12 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 
 			for i, userValue := range userAnswer{
 				for j, examValue := range question.Answer{
-					if userValue.(int) == examValue{
+					if int(userValue.(float64)) == examValue{
 						goodAnswers++
 						examCorrectOptions[j] = question.Options[examValue]
 					}
 				}
-				userOptions[i] = question.Options[userValue.(int)]
+				userOptions[i] = question.Options[int(userValue.(float64))]
 			}
 
 			if goodAnswers == len(question.Answer){
@@ -492,6 +497,7 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 		"$set" : bson.M{
 			"grade" : grade,
 			"question" : questionsMap,
+			"finish" : true,
 		},
 	}
 
