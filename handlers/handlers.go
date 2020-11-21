@@ -48,6 +48,7 @@ func Manejadores() {
 	router.HandleFunc("/questions", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateQuestion))).Methods("PUT")
 	router.HandleFunc("/questions", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllQuestionsRouter))).Methods("GET")
 	router.HandleFunc("/questions", middleware.DatabaseVerify(middleware.ValidationJWT(routers.DeleteQuestionsRouter))).Methods("DELETE")
+	router.HandleFunc("/getonequestion", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetOnequestion))).Methods("GET")
 
 	//Rutas grupos
 	router.HandleFunc("/group", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateGroup))).Methods("POST")
