@@ -103,8 +103,8 @@ func GenerateMockExam(examModel models.Exam, loggedUser string, institution stri
 }
 
 //GetQuestions trae las preguntas necesarias para el examen
-func GetQuestions(examModel models.Exam, institution string) (map[string][]interface{}, bool, error) {
-	questions := make(map[string][]interface{})
+func GetQuestions(examModel models.Exam, institution string) (map[string]float64, bool, error) {
+	questions := make(map[string]float64)
 	var random int
 	questionsFacil, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "1", 3, -1, institution)
 	questionsNormal, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "2", 3, -1, institution)
@@ -116,8 +116,7 @@ func GetQuestions(examModel models.Exam, institution string) (map[string][]inter
 	for i < facil {
 		random = rand.Intn(len(questionsFacil) - 1)
 		if _, exist := questions[questionsFacil[random].ID]; !exist {
-			questions[questionsFacil[random].ID][0] = 0.0
-			questions[questionsFacil[random].ID][1] = ""
+			questions[questionsFacil[random].ID] = 0.0
 			i++
 		}
 	}
@@ -125,8 +124,7 @@ func GetQuestions(examModel models.Exam, institution string) (map[string][]inter
 	for i < normal {
 		random = rand.Intn(len(questionsNormal) - 1)
 		if _, exist := questions[questionsNormal[random].ID]; !exist {
-			questions[questionsNormal[random].ID][0] = 0.0
-			questions[questionsNormal[random].ID][1] = ""
+			questions[questionsNormal[random].ID] = 0.0
 			i++
 		}
 	}
@@ -134,8 +132,7 @@ func GetQuestions(examModel models.Exam, institution string) (map[string][]inter
 	for i < dificil {
 		random = rand.Intn(len(questionsDificil) - 1)
 		if _, exist := questions[questionsDificil[random].ID]; !exist {
-			questions[questionsDificil[random].ID][0] = 0.0
-			questions[questionsDificil[random].ID][1] = ""
+			questions[questionsDificil[random].ID] = 0.0
 			i++
 		}
 	}

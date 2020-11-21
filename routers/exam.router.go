@@ -388,11 +388,7 @@ func GradeExam(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	institutionid, found := requestBody["institutionid"].(string)
-	if !found{
-		http.Error(w, "Debe especificar el ID de la institucion", http.StatusBadRequest)
-		return
-	}
+	
 
 	examid, found := requestBody["examid"].(string)
 	if !found{
@@ -408,15 +404,15 @@ func GradeExam(w http.ResponseWriter, r *http.Request){
 	
 
 	var generatedExam models.GenerateExam
-	generatedExam, found = generateExam.GetGenerateExamByID(examid,institutionid)
+	generatedExam, found = generateExam.GetGenerateExamByID(examid,InstitutionID)
 	if !found{
 		http.Error(w, "El examen no existe en esta institucion", http.StatusBadRequest)
 		return
 	}
 
-	updateString, message := GradeQuestions(generatedExam, userAnswers, institutionid)
+	updateString, message := GradeQuestions(generatedExam, userAnswers, InstitutionID)
 	if message != ""{
-		http.Error(w, "El examen no existe en esta institucion", http.StatusInternalServerError)
+		http.Error(w, "Error al calificar el examen", http.StatusInternalServerError)
 		return
 	}
 
