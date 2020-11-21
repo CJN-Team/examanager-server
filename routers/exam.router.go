@@ -11,6 +11,7 @@ import (
 
 	database "github.com/CJN-Team/examanager-server/database/examqueries"
 	generateExam "github.com/CJN-Team/examanager-server/database/generatexamqueries"
+	dbuser "github.com/CJN-Team/examanager-server/database/usersqueries"
 
 	grupDB "github.com/CJN-Team/examanager-server/database/groupqueries"
 	"github.com/CJN-Team/examanager-server/models"
@@ -21,6 +22,13 @@ func CreateExam(w http.ResponseWriter, r *http.Request) {
 	var exam models.Exam
 
 	error := json.NewDecoder(r.Body).Decode(&exam)
+
+	user, _ := dbuser.GetUserByIDOneInstitution(IDUser, InstitutionID)
+
+	if user.Profile == "Estudiante" {
+		http.Error(w, "La persona no tiene los permisos", 400)
+		return
+	}
 
 	if error != nil {
 		http.Error(w, "Error en los datos recibidos "+error.Error(), 400)
@@ -140,6 +148,12 @@ func CreateGenerateExam(w http.ResponseWriter, r *http.Request) {
 func DeleteExam(w http.ResponseWriter, r *http.Request) {
 	ID := r.URL.Query().Get("id")
 
+	user, _ := dbuser.GetUserByIDOneInstitution(IDUser, InstitutionID)
+	if user.Profile == "Estudiante" {
+		http.Error(w, "La persona no tiene los permisos", 400)
+		return
+	}
+
 	if len(ID) < 1 {
 		http.Error(w, "Falta el parametro ID", http.StatusBadRequest)
 		return
@@ -168,6 +182,12 @@ func UpdateExam(w http.ResponseWriter, r *http.Request) {
 
 	if error != nil {
 		http.Error(w, "Datos Incorrectos"+error.Error(), 400)
+		return
+	}
+
+	user, _ := dbuser.GetUserByIDOneInstitution(IDUser, InstitutionID)
+	if user.Profile == "Estudiante" {
+		http.Error(w, "La persona no tiene los permisos", 400)
 		return
 	}
 
@@ -205,6 +225,12 @@ func UpdateExamGrade(w http.ResponseWriter, r *http.Request) {
 
 	if error != nil {
 		http.Error(w, "Datos Incorrectos"+error.Error(), 400)
+		return
+	}
+
+	user, _ := dbuser.GetUserByIDOneInstitution(IDUser, InstitutionID)
+	if user.Profile == "Estudiante" {
+		http.Error(w, "La persona no tiene los permisos"+error.Error(), 400)
 		return
 	}
 
@@ -281,6 +307,12 @@ func GetGenerateExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, _ := dbuser.GetUserByIDOneInstitution(IDUser, InstitutionID)
+	if user.Profile == "Estudiante" {
+		http.Error(w, "La persona no tiene los permisos", 400)
+		return
+	}
+
 	result, correct := generateExam.GetGenerateExamByID(ID, InstitutionID)
 
 	if correct == false {
@@ -302,6 +334,13 @@ func GeneratePDF(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Falta el parametro ID", http.StatusBadRequest)
 		return
 	}
+
+	user, _ := dbuser.GetUserByIDOneInstitution(IDUser, InstitutionID)
+	if user.Profile == "Estudiante" {
+		http.Error(w, "La persona no tiene los permisos", 400)
+		return
+	}
+
 	exam, _, _ := database.GetExamByID(ID, InstitutionID)
 
 	generateExam.CreatePDF(exam, InstitutionID)
