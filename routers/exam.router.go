@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"fmt"
+	//"fmt"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -265,7 +265,7 @@ func UpdateExamGrade(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Debes estar logueado", http.StatusBadRequest)
 		return
 	}
-	modelexam, _ := generateExam.GetGenerateExamByID(id,InstitutionID)
+	modelexam, _ := generateExam.GetGenerateExamByID(id, InstitutionID)
 	modelexam.Commentary = exam.Commentary
 	status, error := database.UpdateGenerateExam(modelexam, id)
 
@@ -395,24 +395,24 @@ func DownloadPDF(w http.ResponseWriter, r *http.Request) {
 //GradeExam califica automaticamente el examen y lo guarda en la base de datos
 func GradeExam(w http.ResponseWriter, r *http.Request) {
 	requestBody := make(map[string]interface{})
-	
+
 	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 		http.Error(w, "Debe enviar un request body", http.StatusBadRequest)
 		return
 	}
-	
+
 	examid, found := requestBody["examid"].(string)
 	if !found {
 		http.Error(w, "Debe especificar el ID del examen", http.StatusBadRequest)
 		return
 	}
-	
+
 	option, found := requestBody["option"].(string)
 	if !found {
 		http.Error(w, "Debe especificar una opcion para calificacion", http.StatusBadRequest)
 		return
 	}
-	
+
 	if option == "manual" {
 		GradeOpenQuestion(w, r, requestBody, examid)
 		return
@@ -515,7 +515,7 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 	}
 	updateString = bson.M{
 		"$set": bson.M{
-			"grade":0,
+			"grade":    0,
 			"question": questionsMap,
 			"finish":   true,
 		},
@@ -539,14 +539,14 @@ func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[s
 		http.Error(w, "El examen no existe en esta institucion", http.StatusBadRequest)
 		return
 	}
-	
+
 	updateString := bson.M{}
 	questionsMap := make(map[string]interface{})
 	grade := 0.0
 	quantity := 0
-	
+
 	examQuestions := generatedExam.Questions
-	fmt.Println(examQuestions)
+
 	for key := range examQuestions {
 		quantity++
 
@@ -556,24 +556,23 @@ func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[s
 			return
 		}
 
-		questionsMap[key] = examQuestions[key]	
+		questionsMap[key] = examQuestions[key]
 		teacherGrade, found := teacherGrades[key].(float64)
 
 		if question.Category == "Pregunta abierta" {
-			
-			fmt.Println(teacherGrades)
-			
+
+
 			if !found {
 				continue
 			}
 			questionsMap[key].([]interface{})[0] = teacherGrade
 			grade += teacherGrade
-		}else{
+		} else {
 			grade += examQuestions[key][0].(interface{}).(float64)
 		}
 	}
 
-	grade /=  float64(quantity)
+	grade /= float64(quantity)
 	updateString = bson.M{
 		"$set": bson.M{
 			"grade":    grade,
@@ -581,8 +580,7 @@ func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[s
 			"finish":   true,
 		},
 	}
-	fmt.Println(updateString)
-	fmt.Println("6666")
+
 	err := generateExam.UpdateExam(examid, updateString)
 	if err != nil {
 		http.Error(w, "Error al calificar el examen"+err.Error(), http.StatusInternalServerError)
