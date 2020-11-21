@@ -30,7 +30,7 @@ func AddUser(u models.User, loggedUser string, loggedInstitution string) (string
 
 	_, error := GetUserByIDAllInstitutions(u.ID)
 
-	if error != nil {
+	if error == nil {
 		error := errors.New("El usuario ya existe")
 		return "", false, error
 	}
