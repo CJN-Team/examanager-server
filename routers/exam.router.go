@@ -1,7 +1,7 @@
 package routers
 
 import (
-	//"fmt"
+	"fmt"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -527,25 +527,25 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 
 //GradeOpenQuestion le permite al profesor calificar las preguntas abiertas
 func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[string]interface{}, examid string) {
-
+	fmt.Println("11111")
 	teacherGrades, found := requestBody["questions"].(map[string]interface{})
 	if !found {
 		http.Error(w, "Debe especificar las preguntas", http.StatusBadRequest)
 		return
 	}
-
+	fmt.Println("2222")
 	var generatedExam models.GenerateExam
 	generatedExam, found = generateExam.GetGenerateExamByID(examid, InstitutionID)
 	if !found {
 		http.Error(w, "El examen no existe en esta institucion", http.StatusBadRequest)
 		return
 	}
-
+	fmt.Println("3333")
 	updateString := bson.M{}
 	questionsMap := make(map[string]interface{})
 	grade := 0.0
 	quantity := 0
-
+	fmt.Println("4444")
 	examQuestions := generatedExam.Questions
 	for key := range examQuestions {
 
@@ -569,6 +569,7 @@ func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[s
 			grade += teacherGrade
 		}
 	}
+	fmt.Println("55555")
 	grade = generatedExam.Grade + (grade / float64(quantity))
 	updateString = bson.M{
 		"$set": bson.M{
@@ -577,7 +578,8 @@ func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[s
 			"finish":   true,
 		},
 	}
-
+	fmt.Println(updateString)
+	fmt.Println("6666")
 	err := generateExam.UpdateExam(examid, updateString)
 	if err != nil {
 		http.Error(w, "Error al calificar el examen"+err.Error(), http.StatusInternalServerError)
