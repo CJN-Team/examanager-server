@@ -82,7 +82,9 @@ func UpdateGenerateExam(exam models.GenerateExam, ID string) (bool, error) {
 	coleccion := database.Collection("GenerateExam")
 	examRegisterd := make(map[string]interface{})
 
-	examRegisterd["grade"] = exam.Grade
+	if exam.Grade != 0.0 {
+		examRegisterd["grade"] = exam.Grade
+	}
 
 	examRegisterd["finish"] = exam.Finish
 
