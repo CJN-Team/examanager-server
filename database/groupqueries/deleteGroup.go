@@ -70,16 +70,18 @@ func DeleteExamsOfStudents(groupid string, generatedExamID string, institutionID
 	for studentid, exams := range(groupModel.StudentsList){
 		exist := false
 		pos := 0
-		for i, examid := range(exams.([]string)){
+
+		for i, examid := range(exams.(primitive.A)){
 			if examid == generatedExamID{
 				exist = true
 				pos = i
 			}
+
 		}
 		if exist{
-			exams.([]string)[pos] = exams.([]string)[len(exams.([]string))-1]
-			exams.([]string)[len(exams.([]string))-1] = ""
-			groupModel.StudentsList[studentid] = exams.([]string)[:len(exams.([]string))-1]
+			exams.(primitive.A)[pos] = exams.(primitive.A)[len(exams.(primitive.A))-1]
+			exams.(primitive.A)[len(exams.(primitive.A))-1] = ""
+			groupModel.StudentsList[studentid] = exams.(primitive.A)[:len(exams.(primitive.A))-1]
 		}
 	}
 	
