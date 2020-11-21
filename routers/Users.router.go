@@ -2,12 +2,12 @@ package routers
 
 import (
 	"encoding/json"
+	"image"
 	"image/jpeg"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/nfnt/resize"
 
@@ -218,11 +218,9 @@ func UploadUserImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file, handler, error := r.FormFile("image")
+	file, _, error := r.FormFile("image")
 
-	var imageExtencion = strings.Split(handler.Filename, ".")[1]
-
-	var fileRoute string = "assets/users/" + ID + "." + imageExtencion
+	var fileRoute string = "assets/users/" + ID + ".jpg"
 
 	aux, error := os.OpenFile(fileRoute, os.O_WRONLY|os.O_CREATE, 0666)
 
@@ -248,7 +246,7 @@ func UploadUserImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	img, error := jpeg.Decode(file)
+	img, _, error := image.Decode(file)
 
 	if error != nil {
 		http.Error(w, "Error al decodificar la imagen:  "+error.Error(), 400)
@@ -264,6 +262,8 @@ func UploadUserImage(w http.ResponseWriter, r *http.Request) {
 	defer out.Close()
 
 	jpeg.Encode(out, auxValue, nil)
+
+	user.Photo = ID + ".jpg"
 
 	status, error = database.UpdateUser(user, ID, IDUser, InstitutionID)
 

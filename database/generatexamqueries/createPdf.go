@@ -35,7 +35,7 @@ func CreatePDF(exams models.Exam, institution string) {
 		x, y := 30.0, 40.0
 		generate, _ := GetGenerateExamByID(exams.GenerateExam[i], institution)
 		user, _ := getUserByIDOneInstitution(generate.StudentID, institution)
-		pdf.Image("assets/users/"+user.Photo, 300, 10, nil)
+		pdf.Image("assets/users/"+user.Photo, 425, 30, nil)
 		pdf.SetX(x)
 		pdf.SetY(y)
 		pdf.Text(generate.InstitutionName)
