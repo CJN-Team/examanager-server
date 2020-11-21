@@ -1,6 +1,7 @@
 package groupqueries
 
 import (
+	"fmt"
 	"context"
 	"errors"
 	"time"
@@ -52,13 +53,10 @@ func userTypeVerificationdeleting(loggedUser string, loggedInstitution string) b
 	return false
 }
 
-func DeleteExamsOfStudents(groupid string, generatedExamID string, institutionID string)(error) {
+//DeleteExamsOfStudents elimina los examanes generados del padre de los estudiantes de un grupo, metodo de Andres
+func DeleteExamsOfStudents(groupid string, generatedExamID string, loggedUser string,institutionID string)(error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-
-	database := dbConnection.MongoConexion.Database("examanager_db")
-	col := database.Collection("groups")
+	newStudentsList := bson.M{}
 
 	var groupModel models.Group
 	groupModel, err := GetGroupByID(groupid, institutionID)
@@ -68,34 +66,23 @@ func DeleteExamsOfStudents(groupid string, generatedExamID string, institutionID
 	}
 
 	for studentid, exams := range(groupModel.StudentsList){
-		exist := false
-		pos := 0
 
-		for i, examid := range(exams.(primitive.A)){
-			if examid == generatedExamID{
-				exist = true
-				pos = i
+		newExams := bson.A{}
+		j:=0
+		for _, examid := range(exams.(primitive.A)){
+
+			if examid.(string) != generatedExamID{
+				newExams = append(newExams,examid.(string))
+				j++
 			}
 
 		}
-		if exist{
-			exams.(primitive.A)[pos] = exams.(primitive.A)[len(exams.(primitive.A))-1]
-			exams.(primitive.A)[len(exams.(primitive.A))-1] = ""
-			groupModel.StudentsList[studentid] = exams.(primitive.A)[:len(exams.(primitive.A))-1]
-		}
-	}
-	
-	updateString := bson.M{
-		"$set": bson.M{
-			"studentsList" : groupModel.StudentsList,
-		},
+
+		newStudentsList[studentid] = newExams
 	}
 
-	id, _ := primitive.ObjectIDFromHex(groupid)
-
-	filter := bson.M{"_id": bson.M{"$eq": id}}
-
-	_, err = col.UpdateOne(ctx, filter, updateString)
-
+	groupModel.StudentsList = newStudentsList
+	_,err = UpdateGroup(groupModel,groupModel.ID,loggedUser,institutionID)
+	fmt.Println(err)
 	return err
 }

@@ -183,7 +183,7 @@ func DeleteExam(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error al eliminar el examen: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		err = grupDB.DeleteExamsOfStudents(examModel.GroupID, generatedExamID, InstitutionID)
+		err = grupDB.DeleteExamsOfStudents(examModel.GroupID, generatedExamID, IDUser, InstitutionID)
 		if err != nil {
 			http.Error(w, "Error al eliminar el examen de los estudiantes: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -472,7 +472,6 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 
 		userAnswer, found := userAnswers[key].([]interface{})
 		if !found {
-			quantity++
 			continue
 		}
 
@@ -520,7 +519,7 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 			quantity--
 		}
 	}
-	grade /= float64(quantity)
+	grade = grade/float64(quantity)
 	updateString = bson.M{
 		"$set": bson.M{
 			"grade":    grade,
@@ -555,17 +554,26 @@ func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[s
 
 	examQuestions := generatedExam.Questions
 	for key := range examQuestions {
-		quantity++
 
-		teacherGrade, found := teacherGrades[key].(float64)
-		if !found {
-			http.Error(w, "Esta pregunta no existe en este cuestionario ", http.StatusBadRequest)
-			return
+		question, _, err := questionsDB.GetQuestionByID(key, InstitutionID)
+		if err != nil {
+			http.Error(w, "Error al encontrar la pregunta "+err.Error(), http.StatusInternalServerError)
+				return
 		}
 
-		questionsMap[key] = examQuestions[key]
-		questionsMap[key].([]interface{})[0] = teacherGrade
-		grade += teacherGrade
+		if question.Category == "Pregunta abierta" {
+			quantity++
+			
+			teacherGrade, found := teacherGrades[key].(float64)
+			if !found {
+				http.Error(w, "Esta pregunta no existe en este cuestionario ", http.StatusBadRequest)
+				return
+			}
+
+			questionsMap[key] = examQuestions[key]
+			questionsMap[key].([]interface{})[0] = teacherGrade
+			grade += teacherGrade
+		}
 	}
 	grade = generatedExam.Grade + (grade / float64(quantity))
 	updateString = bson.M{

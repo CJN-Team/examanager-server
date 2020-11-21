@@ -6,6 +6,7 @@ import (
 
 	dbConnection "github.com/CJN-Team/examanager-server/database"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 )
 
@@ -18,8 +19,9 @@ func DeleteExam(examID string) (bool, error) {
 	db := dbConnection.MongoConexion.Database("examanager_db")
 	col := db.Collection("Exam")
 
+	id, _ := primitive.ObjectIDFromHex(examID)
 	condicion := bson.M{
-		"_id": examID,
+		"_id": id,
 	}
 
 	_, err := col.DeleteOne(ctx, condicion)
@@ -40,8 +42,9 @@ func DeleteGeneratedExams(examID string) (bool, error){
 	db := dbConnection.MongoConexion.Database("examanager_db")
 	col := db.Collection("GenerateExam")
 
+	id, _ := primitive.ObjectIDFromHex(examID)
 	condicion := bson.M{
-		"_id": examID,
+		"_id": id,
 	}
 
 	_, err := col.DeleteOne(ctx, condicion)
