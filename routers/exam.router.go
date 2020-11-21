@@ -395,24 +395,24 @@ func DownloadPDF(w http.ResponseWriter, r *http.Request) {
 //GradeExam califica automaticamente el examen y lo guarda en la base de datos
 func GradeExam(w http.ResponseWriter, r *http.Request) {
 	requestBody := make(map[string]interface{})
-
+	
 	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 		http.Error(w, "Debe enviar un request body", http.StatusBadRequest)
 		return
 	}
-
+	
 	examid, found := requestBody["examid"].(string)
 	if !found {
 		http.Error(w, "Debe especificar el ID del examen", http.StatusBadRequest)
 		return
 	}
-
+	
 	option, found := requestBody["option"].(string)
 	if !found {
 		http.Error(w, "Debe especificar una opcion para calificacion", http.StatusBadRequest)
 		return
 	}
-
+	
 	if option == "manual" {
 		GradeOpenQuestion(w, r, requestBody, examid)
 		return
@@ -513,10 +513,9 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 			quantity--
 		}
 	}
-	grade = grade/float64(quantity)
 	updateString = bson.M{
 		"$set": bson.M{
-			"grade":    grade,
+			"grade":0,
 			"question": questionsMap,
 			"finish":   true,
 		},
@@ -527,50 +526,54 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 
 //GradeOpenQuestion le permite al profesor calificar las preguntas abiertas
 func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[string]interface{}, examid string) {
-	fmt.Println("11111")
 	teacherGrades, found := requestBody["questions"].(map[string]interface{})
+
 	if !found {
 		http.Error(w, "Debe especificar las preguntas", http.StatusBadRequest)
 		return
 	}
-	fmt.Println("2222")
+
 	var generatedExam models.GenerateExam
 	generatedExam, found = generateExam.GetGenerateExamByID(examid, InstitutionID)
 	if !found {
 		http.Error(w, "El examen no existe en esta institucion", http.StatusBadRequest)
 		return
 	}
-	fmt.Println("3333")
+	
 	updateString := bson.M{}
 	questionsMap := make(map[string]interface{})
 	grade := 0.0
 	quantity := 0
-	fmt.Println("4444")
+	
 	examQuestions := generatedExam.Questions
+	fmt.Println(examQuestions)
 	for key := range examQuestions {
+		quantity++
 
 		question, _, err := questionsDB.GetQuestionByID(key, InstitutionID)
 		if err != nil {
 			http.Error(w, "Error al encontrar la pregunta "+err.Error(), http.StatusInternalServerError)
-				return
+			return
 		}
+
+		questionsMap[key] = examQuestions[key]	
+		teacherGrade, found := teacherGrades[key].(float64)
 
 		if question.Category == "Pregunta abierta" {
-			quantity++
 			
-			teacherGrade, found := teacherGrades[key].(float64)
+			fmt.Println(teacherGrades)
+			
 			if !found {
-				http.Error(w, "Esta pregunta no existe en este cuestionario ", http.StatusBadRequest)
-				return
+				continue
 			}
-
-			questionsMap[key] = examQuestions[key]
 			questionsMap[key].([]interface{})[0] = teacherGrade
 			grade += teacherGrade
+		}else{
+			grade += examQuestions[key][0].(interface{}).(float64)
 		}
 	}
-	fmt.Println("55555")
-	grade = generatedExam.Grade + (grade / float64(quantity))
+
+	grade /=  float64(quantity)
 	updateString = bson.M{
 		"$set": bson.M{
 			"grade":    grade,
