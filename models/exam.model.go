@@ -9,13 +9,13 @@ import (
 //Exam es una estructura basica para el manejo de los examenes
 type Exam struct {
 	ID            primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	View          bool               `bson:"view,omitempty" json:"view,omitempty"`
-	MockExam      bool               `bson:"mockExam,omitempty" json:"mockExam,omitempty"`
+	View          bool               `bson:"view" json:"view"`
+	MockExam      bool               `bson:"mockExam" json:"mockExam"`
 	Institution   string             `bson:"institution,omitempty" json:"institution,omitempty"`
 	SubjectID     string             `bson:"subjectID,omitempty" json:"subjectID"`
 	GroupID       string             `bson:"groupId,omitempty" json:"groupId"`
 	Name          string             `bson:"name,omitempty" json:"name,omitempty"`
-	State         bool               `bson:"state,omitempty" json:"state,omitempty"`
+	State         bool               `bson:"state" json:"state"`
 	Difficulty    []int              `bson:"difficulty,omitempty" json:"difficulty,omitempty"` //posicion 0 dificultad 1, posicion 1 dificultad 2, pocicion 2 dificultad 3
 	TopicQuestion string             `bson:"topicQuestion,omitempty" json:"topicQuestion,omitempty"`
 	Date          time.Time          `bson:"date,omitempty" json:"date,omitempty"`
