@@ -329,12 +329,6 @@ func GetGenerateExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, _ := dbuser.GetUserByIDOneInstitution(IDUser, InstitutionID)
-	if user.Profile == "Estudiante" {
-		http.Error(w, "La persona no tiene los permisos", 400)
-		return
-	}
-
 	result, correct := generateExam.GetGenerateExamByID(ID, InstitutionID)
 
 	if correct == false {

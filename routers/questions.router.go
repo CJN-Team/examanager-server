@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	database "github.com/CJN-Team/examanager-server/database/questionsqueries"
-	dbuser "github.com/CJN-Team/examanager-server/database/usersqueries"
 	"github.com/CJN-Team/examanager-server/models"
 )
 
@@ -180,12 +179,6 @@ func GetOnequestion(w http.ResponseWriter, r *http.Request) {
 
 	if len(ID) < 1 {
 		http.Error(w, "Falta el parametro id", http.StatusBadRequest)
-		return
-	}
-
-	user, _ := dbuser.GetUserByIDOneInstitution(IDUser, InstitutionID)
-	if user.Profile == "Estudiante" {
-		http.Error(w, "La persona no tiene los permisos", 400)
 		return
 	}
 
