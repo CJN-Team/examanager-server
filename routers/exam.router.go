@@ -161,17 +161,30 @@ func DeleteExam(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Falta el parametro ID", http.StatusBadRequest)
 		return
 	}
+
+	var examModel models.Exam
+	examModel, found, _ := database.GetExamByID(ID, InstitutionID)
+	if !found {
+		http.Error(w, "Este examen no existe en la base de datos ", http.StatusBadRequest)
+		return
+	}
+
+
 	_, err := database.DeleteExam(ID)
 	if err != nil {
 		http.Error(w, "Error al eliminar el examen: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	_, err = database.DeleteGeneratedExams(ID)
-	if err != nil {
-		http.Error(w, "Error al eliminar el examen: "+err.Error(), http.StatusInternalServerError)
-		return
+	for _, generatedExamID := range(examModel.GenerateExam){
+		_, err = database.DeleteGeneratedExams(generatedExamID)
+		if err != nil {
+			http.Error(w, "Error al eliminar el examen: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
+	
+	
 
 	CleanToken()
 	w.WriteHeader(http.StatusAccepted)

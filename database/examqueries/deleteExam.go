@@ -43,7 +43,7 @@ func DeleteGeneratedExams(examID string) (bool, error){
 		"_id": examID,
 	}
 
-	_, err := col.DeleteMany(ctx, condicion)
+	_, err := col.DeleteOne(ctx, condicion)
 
 
 	if err != nil {
