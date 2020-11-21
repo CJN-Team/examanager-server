@@ -82,7 +82,7 @@ func CreateExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, status, error := database.AddExam(exam)
+	idexam, status, error := database.AddExam(exam)
 
 	if error != nil {
 		http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
@@ -94,7 +94,9 @@ func CreateExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	CleanToken()
+	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(idexam)
 }
 
 //CreateGenerateExam funcion para crear un examen
@@ -169,22 +171,19 @@ func DeleteExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	_, err := database.DeleteExam(ID)
 	if err != nil {
 		http.Error(w, "Error al eliminar el examen: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	for _, generatedExamID := range(examModel.GenerateExam){
+	for _, generatedExamID := range examModel.GenerateExam {
 		_, err = database.DeleteGeneratedExams(generatedExamID)
 		if err != nil {
 			http.Error(w, "Error al eliminar el examen: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
-	
-	
 
 	CleanToken()
 	w.WriteHeader(http.StatusAccepted)
@@ -393,53 +392,53 @@ func DownloadPDF(w http.ResponseWriter, r *http.Request) {
 }
 
 //GradeExam califica automaticamente el examen y lo guarda en la base de datos
-func GradeExam(w http.ResponseWriter, r *http.Request){
+func GradeExam(w http.ResponseWriter, r *http.Request) {
 	requestBody := make(map[string]interface{})
 
-	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil{
+	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 		http.Error(w, "Debe enviar un request body", http.StatusBadRequest)
 		return
 	}
 
 	examid, found := requestBody["examid"].(string)
-	if !found{
+	if !found {
 		http.Error(w, "Debe especificar el ID del examen", http.StatusBadRequest)
 		return
 	}
 
 	option, found := requestBody["option"].(string)
-	if !found{
+	if !found {
 		http.Error(w, "Debe especificar una opcion para calificacion", http.StatusBadRequest)
 		return
 	}
 
-	if option == "manual"{
+	if option == "manual" {
 		GradeOpenQuestion(w, r, requestBody, examid)
 		return
 	}
 
 	userAnswers, found := requestBody["questions"].(map[string]interface{})
-	if !found{
+	if !found {
 		http.Error(w, "Debe especificar las preguntas", http.StatusBadRequest)
 		return
 	}
-	
+
 	var generatedExam models.GenerateExam
-	generatedExam, found = generateExam.GetGenerateExamByID(examid,InstitutionID)
-	if !found{
+	generatedExam, found = generateExam.GetGenerateExamByID(examid, InstitutionID)
+	if !found {
 		http.Error(w, "El examen no existe en esta institucion", http.StatusBadRequest)
 		return
 	}
 
 	updateString, message := GradeQuestions(generatedExam, userAnswers, InstitutionID)
-	if message != ""{
+	if message != "" {
 		http.Error(w, "Error al calificar el examen", http.StatusInternalServerError)
 		return
 	}
 
-	err := generateExam.UpdateExam(examid,updateString)
-	if err != nil{
-		http.Error(w, "Error al calificar el examen" + err.Error(), http.StatusInternalServerError)
+	err := generateExam.UpdateExam(examid, updateString)
+	if err != nil {
+		http.Error(w, "Error al calificar el examen"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -448,49 +447,49 @@ func GradeExam(w http.ResponseWriter, r *http.Request){
 }
 
 //GradeQuestions califica automaticamente las respuestas de los estudiantes
-func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]interface{}, institutionid string)(bson.M, string){
+func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]interface{}, institutionid string) (bson.M, string) {
 	updateString := bson.M{}
 	questionsMap := make(map[string]interface{})
 	grade := 0.0
 	quantity := 0
 
 	examQuestions := generatedExam.Questions
-	for key := range(examQuestions){
+	for key := range examQuestions {
 		quantity++
 
 		var question models.Question
 		question, _, err := questionsDB.GetQuestionByID(key, institutionid)
-		if err != nil{
+		if err != nil {
 			return updateString, "Error al buscar la pregunta en la base de datos: " + err.Error()
 		}
 
-		userAnswer,found := userAnswers[key].([]interface{})
-		if !found{
+		userAnswer, found := userAnswers[key].([]interface{})
+		if !found {
 			quantity++
 			continue
 		}
 
-		if question.Category == "Respuesta única" ||  question.Category == "Verdadero o falso"{
+		if question.Category == "Respuesta única" || question.Category == "Verdadero o falso" {
 
 			userOption := []string{question.Options[int(userAnswer[0].(float64))]}
 			examCorrectOption := []string{question.Options[question.Answer[0]]}
 
-			if int(userAnswer[0].(float64)) == question.Answer[0]{
-				questionsMap[key] = []interface{}{5.0,userOption,examCorrectOption}
-				grade+=5.0
+			if int(userAnswer[0].(float64)) == question.Answer[0] {
+				questionsMap[key] = []interface{}{5.0, userOption, examCorrectOption}
+				grade += 5.0
 
-			}else{
-				questionsMap[key] = []interface{}{0.0,userOption,examCorrectOption}
+			} else {
+				questionsMap[key] = []interface{}{0.0, userOption, examCorrectOption}
 			}
 
-		}else if question.Category == "Selección múltiple" {
+		} else if question.Category == "Selección múltiple" {
 			goodAnswers := 0
-			userOptions := make([]string,len(userAnswer))
-			examCorrectOptions := make([]string,len(question.Answer))
+			userOptions := make([]string, len(userAnswer))
+			examCorrectOptions := make([]string, len(question.Answer))
 
-			for i, userValue := range userAnswer{
-				for j, examValue := range question.Answer{
-					if int(userValue.(float64)) == examValue{
+			for i, userValue := range userAnswer {
+				for j, examValue := range question.Answer {
+					if int(userValue.(float64)) == examValue {
 						goodAnswers++
 						examCorrectOptions[j] = question.Options[examValue]
 					}
@@ -498,28 +497,28 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 				userOptions[i] = question.Options[int(userValue.(float64))]
 			}
 
-			if goodAnswers == len(question.Answer){
-				grade+=5.0
-				questionsMap[key] = []interface{}{5.0,userOptions,examCorrectOptions}
-				
-			}else if (goodAnswers < len(question.Answer)) && (goodAnswers > 0){
-				grade+=3.0
-				questionsMap[key] = []interface{}{3.0,userOptions,examCorrectOptions}
+			if goodAnswers == len(question.Answer) {
+				grade += 5.0
+				questionsMap[key] = []interface{}{5.0, userOptions, examCorrectOptions}
 
-			}else{
-				questionsMap[key] = []interface{}{0.0,userOptions,examCorrectOptions}
+			} else if (goodAnswers < len(question.Answer)) && (goodAnswers > 0) {
+				grade += 3.0
+				questionsMap[key] = []interface{}{3.0, userOptions, examCorrectOptions}
+
+			} else {
+				questionsMap[key] = []interface{}{0.0, userOptions, examCorrectOptions}
 			}
-		}else if question.Category == "Pregunta abierta"{
-			questionsMap[key] = []interface{}{0.0,userAnswer,[]string{""}}
+		} else if question.Category == "Pregunta abierta" {
+			questionsMap[key] = []interface{}{0.0, userAnswer, []string{""}}
 			quantity--
 		}
 	}
 	grade /= float64(quantity)
 	updateString = bson.M{
-		"$set" : bson.M{
-			"grade" : grade,
-			"question" : questionsMap,
-			"finish" : true,
+		"$set": bson.M{
+			"grade":    grade,
+			"question": questionsMap,
+			"finish":   true,
 		},
 	}
 
@@ -527,17 +526,17 @@ func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]in
 }
 
 //GradeOpenQuestion le permite al profesor calificar las preguntas abiertas
-func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[string]interface{}, examid string){
+func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[string]interface{}, examid string) {
 
 	teacherGrades, found := requestBody["questions"].(map[string]interface{})
-	if !found{
+	if !found {
 		http.Error(w, "Debe especificar las preguntas", http.StatusBadRequest)
 		return
 	}
-	
+
 	var generatedExam models.GenerateExam
-	generatedExam, found = generateExam.GetGenerateExamByID(examid,InstitutionID)
-	if !found{
+	generatedExam, found = generateExam.GetGenerateExamByID(examid, InstitutionID)
+	if !found {
 		http.Error(w, "El examen no existe en esta institucion", http.StatusBadRequest)
 		return
 	}
@@ -548,32 +547,31 @@ func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[s
 	quantity := 0
 
 	examQuestions := generatedExam.Questions
-	for key := range(examQuestions){
+	for key := range examQuestions {
 		quantity++
 
-		teacherGrade,found := teacherGrades[key].(float64)
-		if !found{
+		teacherGrade, found := teacherGrades[key].(float64)
+		if !found {
 			http.Error(w, "Esta pregunta no existe en este cuestionario ", http.StatusBadRequest)
 			return
 		}
 
 		questionsMap[key] = examQuestions[key]
-		questionsMap[key].([]interface{})[0] = teacherGrade		
-		grade+=teacherGrade
+		questionsMap[key].([]interface{})[0] = teacherGrade
+		grade += teacherGrade
 	}
-	grade = generatedExam.Grade + (grade/float64(quantity))
+	grade = generatedExam.Grade + (grade / float64(quantity))
 	updateString = bson.M{
-		"$set" : bson.M{
-			"grade" : grade,
-			"question" : questionsMap,
-			"finish" : true,
+		"$set": bson.M{
+			"grade":    grade,
+			"question": questionsMap,
+			"finish":   true,
 		},
 	}
-	
 
-	err := generateExam.UpdateExam(examid,updateString)
-	if err != nil{
-		http.Error(w, "Error al calificar el examen" + err.Error(), http.StatusInternalServerError)
+	err := generateExam.UpdateExam(examid, updateString)
+	if err != nil {
+		http.Error(w, "Error al calificar el examen"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
