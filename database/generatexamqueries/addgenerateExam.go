@@ -85,7 +85,7 @@ func GenerateMockExam(examModel models.Exam, loggedUser string, institution stri
 	generateExam.State = examModel.State
 	generateExam.Teacher = group.Teacher
 	generateExam.TeacherID = group.Teacher
-	teacher, _ := userDB.GetUserByID(group.Teacher)
+	teacher, _ := userDB.GetUserByIDOneInstitution(group.Teacher, institution)
 	generateExam.Teacher = teacher.Name + " " + teacher.LastName
 	generateExam.Student = user.Name + " " + user.LastName
 	generateExam.StudentID = user.ID
