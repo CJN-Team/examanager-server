@@ -24,14 +24,14 @@ func AddGroup(group models.Group, loggedUser string, institucionID string) (stri
 	coleccion := database.Collection("groups")
 
 	if loggedUser != "" {
-		_, admin := userTypeVerificationAdding(loggedUser)
+		_, admin := userTypeVerificationAdding(loggedUser, institucionID)
 		if admin {
 			error := errors.New("el usuario no posee los permisos suficientes")
 			return "", false, error
 		}
 	}
 
-	if verifyIfTeacherExist(group.Teacher) != nil {
+	if verifyIfTeacherExist(group.Teacher, institucionID) != nil {
 		error := errors.New("El profesor es invalido o no esta registrado")
 		return "", false, error
 	}
@@ -41,7 +41,7 @@ func AddGroup(group models.Group, loggedUser string, institucionID string) (stri
 		return "", false, error
 	}
 
-	errorUsers := verifyIfStudentExist(group.StudentsList)
+	errorUsers := verifyIfStudentExist(group.StudentsList, institucionID)
 
 	if errorUsers != "" {
 		error := errors.New(errorUsers)
@@ -57,16 +57,16 @@ func AddGroup(group models.Group, loggedUser string, institucionID string) (stri
 	return "", true, nil
 }
 
-func verifyIfTeacherExist(teacher string) error {
+func verifyIfTeacherExist(teacher string, loggedInstitution string) error {
 
-	_, error := usersqueries.GetUserByID(fmt.Sprintf("%v", teacher))
+	_, error := usersqueries.GetUserByIDOneInstitution(fmt.Sprintf("%v", teacher), loggedInstitution)
 	return error
 
 }
 
-func userTypeVerificationAdding(loggedUser string) (string, bool) {
+func userTypeVerificationAdding(loggedUser string, loggedInstitution string) (string, bool) {
 
-	userID, _ := usersqueries.GetUserByID(loggedUser)
+	userID, _ := usersqueries.GetUserByIDOneInstitution(loggedUser, loggedInstitution)
 
 	if userID.Profile != "Administrador" {
 		return "", true
@@ -74,13 +74,13 @@ func userTypeVerificationAdding(loggedUser string) (string, bool) {
 	return userID.Institution, false
 }
 
-func verifyIfStudentExist(users primitive.M) string {
+func verifyIfStudentExist(users primitive.M, loggedInstitution string) string {
 
 	errors := false
 	wrongUsers := "Usuarios invalidos o no registrados: \n"
 	for user, exams := range users {
 		fmt.Println(exams, user)
-		_, error := usersqueries.GetUserByID(fmt.Sprintf("%v", user))
+		_, error := usersqueries.GetUserByIDOneInstitution(fmt.Sprintf("%v", user), loggedInstitution)
 
 		for _, exam := range exams.([]interface{}) {
 			//verificar examnes pero no existe aun :C

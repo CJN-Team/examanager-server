@@ -12,7 +12,7 @@ import (
 )
 
 //DeleteDepartment se encarga de borrar el departamento seleccionado
-func DeleteDepartment(ID string, loggedUser string) error {
+func DeleteDepartment(ID string, loggedUser string, loggedUserInstitution string) error {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -24,9 +24,10 @@ func DeleteDepartment(ID string, loggedUser string) error {
 
 	condicion := bson.M{
 		"_id": departmentID,
+		"institution": loggedUserInstitution,
 	}
 
-	if userTypeVerificationdeleting(loggedUser) {
+	if userTypeVerificationdeleting(loggedUser, loggedUserInstitution) {
 		error := errors.New("el usuario no posee los permisos suficientes")
 		return error
 	}
@@ -39,9 +40,9 @@ func DeleteDepartment(ID string, loggedUser string) error {
 	return error
 }
 
-func userTypeVerificationdeleting(loggedUser string) bool {
+func userTypeVerificationdeleting(loggedUser string, loggedUserInstitution string) bool {
 
-	userID, _ := usersqueries.GetUserByID(loggedUser)
+	userID, _ := usersqueries.GetUserByIDOneInstitution(loggedUser, loggedUserInstitution)
 
 	if userID.Profile != "Administrador" {
 		return true

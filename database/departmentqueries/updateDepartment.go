@@ -13,7 +13,7 @@ import (
 )
 
 //UpdateDepartment se encarga de actualizar el departamento registrado
-func UpdateDepartment(department models.Department, ID string, loggedUser string) (bool, error) {
+func UpdateDepartment(department models.Department, ID string, loggedUser string, loggedUserInstitution string) (bool, error) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -35,14 +35,14 @@ func UpdateDepartment(department models.Department, ID string, loggedUser string
 		"$set": departmentRegistered,
 	}
 
-	if userTypeVerificationdeleting(loggedUser) {
+	if userTypeVerificationUpdating(loggedUser, loggedUserInstitution) {
 		error := errors.New("el usuario no posee los permisos suficientes")
 		return false, error
 	}
 
 	departmentID, _ := primitive.ObjectIDFromHex(ID)
 
-	filter := bson.M{"_id": bson.M{"$eq": departmentID}}
+	filter := bson.M{"_id": bson.M{"$eq": departmentID}, "institution":  bson.M{"$eq": loggedUserInstitution}}
 
 	_, error := coleccion.UpdateOne(contex, filter, updateString)
 
@@ -53,9 +53,9 @@ func UpdateDepartment(department models.Department, ID string, loggedUser string
 	return true, nil
 }
 
-func userTypeVerificationUpdating(loggedUser string) bool {
+func userTypeVerificationUpdating(loggedUser string, loggedUserInstitution string) bool {
 
-	userID, _ := usersqueries.GetUserByID(loggedUser)
+	userID, _ := usersqueries.GetUserByIDOneInstitution(loggedUser, loggedUserInstitution)
 
 	if userID.Profile != "Administrador" {
 		return true

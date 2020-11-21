@@ -112,7 +112,7 @@ func DeleteDepartment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	error := database.DeleteDepartment(ID, IDUser)
+	error := database.DeleteDepartment(ID, IDUser,InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar borrar un departamento"+error.Error(), http.StatusBadRequest)
@@ -146,7 +146,7 @@ func UpdateDepartment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Debes estar logueado", http.StatusBadRequest)
 		return
 	}
-	status, error := database.UpdateDepartment(department, id, IDUser)
+	status, error := database.UpdateDepartment(department, id, IDUser,InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar modificar el registro"+error.Error(), 400)

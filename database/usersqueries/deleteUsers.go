@@ -10,7 +10,7 @@ import (
 )
 
 //DeleteUser se encarga de borrar el usuario seleccionado
-func DeleteUser(ID string, loggedUser string) error {
+func DeleteUser(ID string, loggedUser string, loggedInstitution string) error {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -18,13 +18,14 @@ func DeleteUser(ID string, loggedUser string) error {
 
 	coleccion := database.Collection("users")
 
-	userID:= ID
+	userID := ID
 
 	condicion := bson.M{
 		"_id": userID,
+		"institution":loggedInstitution,
 	}
 
-	if userTypeVerificationdeleting(loggedUser) {
+	if userTypeVerificationdeleting(loggedUser, loggedInstitution) {
 		error := errors.New("el usuario no posee los permisos suficientes")
 		return error
 	}
@@ -34,9 +35,9 @@ func DeleteUser(ID string, loggedUser string) error {
 	return error
 }
 
-func userTypeVerificationdeleting(loggedUser string) bool {
+func userTypeVerificationdeleting(loggedUser string, loggedInstitution string) bool {
 
-	userID, _ := GetUserByID(loggedUser)
+	userID, _ := GetUserByIDOneInstitution(loggedUser, loggedInstitution)
 
 	if userID.Profile != "Administrador" {
 		return true

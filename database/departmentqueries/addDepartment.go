@@ -22,14 +22,14 @@ func AddDepartment(department models.Department, loggedUser string, institucionI
 	coleccion := database.Collection("departments")
 
 	if loggedUser != "" {
-		_, admin := userTypeVerificationAdding(loggedUser)
+		_, admin := userTypeVerificationAdding(loggedUser, institucionID)
 		if admin {
 			error := errors.New("el usuario no posee los permisos suficientes")
 			return "", false, error
 		}
 	}
 
-	errorUsers := verifyIfTeachersExist(department.Teachers)
+	errorUsers := verifyIfTeachersExist(department.Teachers, institucionID)
 
 	if errorUsers != "" {
 		error := errors.New(errorUsers)
@@ -45,9 +45,9 @@ func AddDepartment(department models.Department, loggedUser string, institucionI
 	return "", true, nil
 }
 
-func userTypeVerificationAdding(loggedUser string) (string, bool) {
+func userTypeVerificationAdding(loggedUser string, loggedUserInstitution string) (string, bool) {
 
-	userID, _ := usersqueries.GetUserByID(loggedUser)
+	userID, _ := usersqueries.GetUserByIDOneInstitution(loggedUser, loggedUserInstitution)
 
 	if userID.Profile != "Administrador" {
 		return "", true
@@ -55,13 +55,13 @@ func userTypeVerificationAdding(loggedUser string) (string, bool) {
 	return userID.Institution, false
 }
 
-func verifyIfTeachersExist(users []string) string {
+func verifyIfTeachersExist(users []string, loggedUserInstitution string) string {
 
 	errors := false
 	wrongUsers := "Usuarios invalidos o no registrados: \n"
 	for _, user := range users {
 
-		userModel, error := usersqueries.GetUserByID(fmt.Sprintf("%v", user))
+		userModel, error := usersqueries.GetUserByIDOneInstitution(fmt.Sprintf("%v", user), loggedUserInstitution)
 
 		if error != nil || userModel.Profile != "Profesor" {
 			wrongUsers += fmt.Sprintf("%v", user) + "\n"

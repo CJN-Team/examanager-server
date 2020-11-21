@@ -193,7 +193,7 @@ func GetSubjects(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-//GetSubject trata de recuperar una asignatura 
+//GetSubject trata de recuperar una asignatura
 func GetSubject(w http.ResponseWriter, r *http.Request, SubjectName string) {
 
 	if SubjectName == "" {
@@ -202,10 +202,6 @@ func GetSubject(w http.ResponseWriter, r *http.Request, SubjectName string) {
 	}
 	if len(SubjectName) < 0 {
 		http.Error(w, "El nombre de la asignatura a eliminar es requerido", 400)
-		return
-	}
-	if Profile != "Administrador" {
-		http.Error(w, "Esta opción es válida únicamente para administradores", 403)
 		return
 	}
 

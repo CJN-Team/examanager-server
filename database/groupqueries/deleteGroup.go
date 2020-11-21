@@ -11,7 +11,7 @@ import (
 )
 
 //DeleteGroup se encarga de borrar el grupo seleccionado
-func DeleteGroup(ID string, loggedUser string) error {
+func DeleteGroup(ID string, loggedUser string, loggedInstitution string) error {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -22,10 +22,11 @@ func DeleteGroup(ID string, loggedUser string) error {
 	groupID := ID
 
 	condicion := bson.M{
-		"_id": groupID,
+		"_id":         groupID,
+		"institution": loggedInstitution,
 	}
 
-	if userTypeVerificationdeleting(loggedUser) {
+	if userTypeVerificationdeleting(loggedUser, loggedInstitution) {
 		error := errors.New("el usuario no posee los permisos suficientes")
 		return error
 	}
@@ -38,9 +39,9 @@ func DeleteGroup(ID string, loggedUser string) error {
 	return error
 }
 
-func userTypeVerificationdeleting(loggedUser string) bool {
+func userTypeVerificationdeleting(loggedUser string, loggedInstitution string) bool {
 
-	userID, _ := usersqueries.GetUserByID(loggedUser)
+	userID, _ := usersqueries.GetUserByIDOneInstitution(loggedUser, loggedInstitution)
 
 	if userID.Profile != "Administrador" {
 		return true
