@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	database "github.com/CJN-Team/examanager-server/database/questionsqueries"
+	dbuser "github.com/CJN-Team/examanager-server/database/usersqueries"
 	"github.com/CJN-Team/examanager-server/models"
 )
 
@@ -171,4 +172,32 @@ func DeleteQuestionsRouter(w http.ResponseWriter, r *http.Request) {
 	CleanToken()
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+}
+
+//GetOnequestion trae una pregunta
+func GetOnequestion(w http.ResponseWriter, r *http.Request) {
+	ID := r.URL.Query().Get("id")
+
+	if len(ID) < 1 {
+		http.Error(w, "Falta el parametro id", http.StatusBadRequest)
+		return
+	}
+
+	user, _ := dbuser.GetUserByIDOneInstitution(IDUser, InstitutionID)
+	if user.Profile == "Estudiante" {
+		http.Error(w, "La persona no tiene los permisos", 400)
+		return
+	}
+
+	result, correct, _ := database.GetQuestionByID(ID, InstitutionID)
+
+	if correct == false {
+		http.Error(w, "Error al buscar el examen", http.StatusBadRequest)
+		return
+	}
+	CleanToken()
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(result)
 }

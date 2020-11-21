@@ -116,7 +116,7 @@ func GetQuestions(examModel models.Exam, institution string) (map[string]float64
 	for i < facil {
 		random = rand.Intn(len(questionsFacil) - 1)
 		if _, exist := questions[questionsFacil[random].ID]; !exist {
-			questions[questionsFacil[random].ID] = 0.0
+			questions[questionsFacil[random].ID] = []interface{}{0.0,""}
 			i++
 		}
 	}
@@ -124,7 +124,7 @@ func GetQuestions(examModel models.Exam, institution string) (map[string]float64
 	for i < normal {
 		random = rand.Intn(len(questionsNormal) - 1)
 		if _, exist := questions[questionsNormal[random].ID]; !exist {
-			questions[questionsNormal[random].ID] = 0.0
+			questions[questionsNormal[random].ID] =[]interface{}{0.0,""}
 			i++
 		}
 	}
@@ -132,7 +132,7 @@ func GetQuestions(examModel models.Exam, institution string) (map[string]float64
 	for i < dificil {
 		random = rand.Intn(len(questionsDificil) - 1)
 		if _, exist := questions[questionsDificil[random].ID]; !exist {
-			questions[questionsDificil[random].ID] = 0.0
+			questions[questionsDificil[random].ID] = []interface{}{0.0,""}
 			i++
 		}
 	}
