@@ -96,7 +96,7 @@ func CreateExam(w http.ResponseWriter, r *http.Request) {
 	CleanToken()
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(idexam)
+	json.NewEncoder(w).Encode(bson.M{"id": idexam})
 }
 
 //CreateGenerateExam funcion para crear un examen
