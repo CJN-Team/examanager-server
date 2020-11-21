@@ -265,7 +265,9 @@ func UpdateExamGrade(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Debes estar logueado", http.StatusBadRequest)
 		return
 	}
-	status, error := database.UpdateGenerateExam(exam, id)
+	modelexam, _ := generateExam.GetGenerateExamByID(id,InstitutionID)
+	modelexam.Commentary = exam.Commentary
+	status, error := database.UpdateGenerateExam(modelexam, id)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar modificar el registro"+error.Error(), 400)
