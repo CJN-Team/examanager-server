@@ -58,7 +58,7 @@ func userTypeVerificationUpdating(loggedUser string, loggedInstitution string) b
 
 	userID, _ := usersqueries.GetUserByIDOneInstitution(loggedUser, loggedInstitution)
 
-	if userID.Profile != "Administrador" {
+	if userID.Profile == "Estudiante" {
 		return true
 	}
 	return false
