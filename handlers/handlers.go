@@ -77,6 +77,7 @@ func Manejadores() {
 	router.HandleFunc("/exam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetAllExams))).Methods("GET")
 	router.HandleFunc("/generatedexam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.UpdateExamGrade))).Methods("PUT")
 	router.HandleFunc("/generatedexam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GetGenerateExam))).Methods("GET")
+	router.HandleFunc("/generatedexam", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GradeExam))).Methods("POST")
 	router.HandleFunc("/examgenerator", middleware.DatabaseVerify(middleware.ValidationJWT(routers.CreateGenerateExam))).Methods("PUT")
 	router.HandleFunc("/exampdf", middleware.DatabaseVerify(middleware.ValidationJWT(routers.GeneratePDF))).Methods("PUT")
 	router.HandleFunc("/exampdf", middleware.DatabaseVerify(routers.DownloadPDF)).Methods("GET")

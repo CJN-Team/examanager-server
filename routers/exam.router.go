@@ -1,6 +1,7 @@
 package routers
 
 import (
+	//"fmt"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -11,9 +12,10 @@ import (
 
 	database "github.com/CJN-Team/examanager-server/database/examqueries"
 	generateExam "github.com/CJN-Team/examanager-server/database/generatexamqueries"
-
+	questionsDB "github.com/CJN-Team/examanager-server/database/questionsqueries"
 	grupDB "github.com/CJN-Team/examanager-server/database/groupqueries"
 	"github.com/CJN-Team/examanager-server/models"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 //CreateExam funcion para crear un examen
@@ -335,4 +337,127 @@ func DownloadPDF(w http.ResponseWriter, r *http.Request) {
 	}
 
 	CleanToken()
+}
+
+//GradeExam califica automaticamente el examen y lo guarda en la base de datos
+func GradeExam(w http.ResponseWriter, r *http.Request){
+	requestBody := make(map[string]interface{})
+
+	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil{
+		http.Error(w, "Debe enviar un request body", http.StatusBadRequest)
+		return
+	}
+
+	institutionid, found := requestBody["institutionid"].(string)
+	if !found{
+		http.Error(w, "Debe especificar el ID de la institucion", http.StatusBadRequest)
+		return
+	}
+
+	examid, found := requestBody["examid"].(string)
+	if !found{
+		http.Error(w, "Debe especificar el ID del examen", http.StatusBadRequest)
+		return
+	}
+
+	userAnswers, found := requestBody["questions"].(map[string]interface{})
+	if !found{
+		http.Error(w, "Debe especificar las preguntas", http.StatusBadRequest)
+		return
+	}
+	
+
+	var generatedExam models.GenerateExam
+	generatedExam, found = generateExam.GetGenerateExamByID(examid,institutionid)
+	if !found{
+		http.Error(w, "El examen no existe en esta institucion", http.StatusBadRequest)
+		return
+	}
+
+	updateString, message := GradeQuestions(generatedExam, userAnswers, institutionid)
+	if message != ""{
+		http.Error(w, "El examen no existe en esta institucion", http.StatusInternalServerError)
+		return
+	}
+
+	err := generateExam.UpdateExam(examid,updateString)
+	if err != nil{
+		http.Error(w, "Error al calificar el examen" + err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	CleanToken()
+	w.WriteHeader(http.StatusAccepted)
+}
+
+//GradeQuestions califica automaticamente las respuestas de los estudiantes
+func GradeQuestions(generatedExam models.GenerateExam, userAnswers map[string]interface{}, institutionid string)(bson.M, string){
+	updateString := bson.M{}
+	questionsMap := make(map[string]interface{})
+	grade := 0.0
+	quantity := 0
+
+	examQuestions := generatedExam.Questions
+	for key := range(examQuestions){
+		quantity++
+
+		var question models.Question
+		question, _, err := questionsDB.GetQuestionByID(key, institutionid)
+		if err != nil{
+			return updateString, "Error al buscar la pregunta en la base de datos: " + err.Error()
+		}
+		
+		userAnswer := userAnswers[key].([]interface{})
+		if question.Category == "Respuesta única" ||  question.Category == "Verdadero o falso"{
+
+			userOption := []string{question.Options[question.Answer[0]]}
+			examCorrectOption := []string{question.Options[question.Answer[0]]}
+
+			if userAnswer[0].(int) == question.Answer[0]{
+				questionsMap[key] = []interface{}{5.0,userOption,examCorrectOption}
+				grade+=5.0
+
+			}else{
+				questionsMap[key] = []interface{}{0.0,userOption,examCorrectOption}
+			}
+
+		}else if question.Category == "Selección múltiple" {
+			goodAnswers := 0
+			userOptions := make([]string,len(userAnswer))
+			examCorrectOptions := make([]string,len(question.Answer))
+
+			for i, userValue := range userAnswer{
+				for j, examValue := range question.Answer{
+					if userValue.(int) == examValue{
+						goodAnswers++
+						examCorrectOptions[j] = question.Options[examValue]
+					}
+				}
+				userOptions[i] = question.Options[userValue.(int)]
+			}
+
+			if goodAnswers == len(question.Answer){
+				grade+=5.0
+				questionsMap[key] = []interface{}{5.0,userOptions,examCorrectOptions}
+				
+			}else if (goodAnswers < len(question.Answer)) && (goodAnswers > 0){
+				grade+=3.0
+				questionsMap[key] = []interface{}{3.0,userOptions,examCorrectOptions}
+
+			}else{
+				questionsMap[key] = []interface{}{0.0,userOptions,examCorrectOptions}
+			}
+		}else if question.Category == "Pregunta abierta"{
+			questionsMap[key] = []interface{}{0.0,userAnswer,[]string{""}}
+		}
+	}
+	grade /= float64(quantity)
+	updateString = bson.M{
+		"$set" : bson.M{
+			"grade" : grade,
+			"question" : questionsMap,
+		},
+	}
+
+	return updateString, ""
 }
