@@ -2,7 +2,6 @@ package routers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -182,7 +181,6 @@ func DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(ID, IDUser)
 
 	error := database.DeleteGroup(ID, IDUser,InstitutionID)
 

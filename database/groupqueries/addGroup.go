@@ -78,14 +78,9 @@ func verifyIfStudentExist(users primitive.M, loggedInstitution string) string {
 
 	errors := false
 	wrongUsers := "Usuarios invalidos o no registrados: \n"
-	for user, exams := range users {
-		fmt.Println(exams, user)
+	for user:= range users {
 		_, error := usersqueries.GetUserByIDOneInstitution(fmt.Sprintf("%v", user), loggedInstitution)
 
-		for _, exam := range exams.([]interface{}) {
-			//verificar examnes pero no existe aun :C
-			fmt.Println(exam)
-		}
 
 		if error != nil {
 			wrongUsers += fmt.Sprintf("%v", user) + "\n"

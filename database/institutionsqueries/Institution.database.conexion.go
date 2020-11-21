@@ -2,7 +2,6 @@ package institutionsqueries
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	dbConnection "github.com/CJN-Team/examanager-server/database"
@@ -58,7 +57,7 @@ func GetInstitutionByID(InstitutionID string) (models.Institution, bool, error) 
 	var institutionInfo models.Institution
 	id, _ := primitive.ObjectIDFromHex(InstitutionID)
 	err := col.FindOne(ctx, bson.M{"_id": id}).Decode(&institutionInfo)
-	fmt.Println(InstitutionID)
+
 	if err != nil {
 		return institutionInfo, false, err
 	}

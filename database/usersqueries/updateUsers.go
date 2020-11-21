@@ -3,7 +3,6 @@ package usersqueries
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	dbConnection "github.com/CJN-Team/examanager-server/database"
@@ -77,7 +76,6 @@ func UpdateUser(user models.User, ID string, loggedUser string, loggedInstitutio
 		return false, error
 	}
 
-	fmt.Println(ID)
 
 	filter := bson.M{"_id": bson.M{"$eq": ID}, "institution": bson.M{"$eq": loggedInstitution}}
 

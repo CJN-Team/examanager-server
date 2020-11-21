@@ -2,7 +2,6 @@ package routers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	database "github.com/CJN-Team/examanager-server/database/institutionsqueries"
@@ -14,9 +13,9 @@ import (
 func InstitutionRegistration(w http.ResponseWriter, r *http.Request) {
 	var InstitutionInfo models.Institution
 	r.ParseForm()
-	fmt.Print(r.Form)
+
 	err := json.NewDecoder(r.Body).Decode(&InstitutionInfo)
-	fmt.Println(InstitutionInfo)
+
 	if err != nil {
 		http.Error(w, "Error en los datos recibidos "+err.Error(), 400)
 		return

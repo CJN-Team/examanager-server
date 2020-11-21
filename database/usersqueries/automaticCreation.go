@@ -8,7 +8,6 @@ import (
 
 	"github.com/CJN-Team/examanager-server/models"
 
-	//"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -50,7 +49,6 @@ func getDocument(link string) (bool, error) {
 		return false, error
 	}
 
-	//fmt.Println(response.Header["Content-Type"][0])
 	if response.Header["Content-Type"][0] != "text/csv" {
 		error := errors.New("Los datos obtenidos del link no son de tipo CSV, intente con un formato valido")
 		return false, error
@@ -63,7 +61,6 @@ func getDocument(link string) (bool, error) {
 		return false, error
 	}
 
-	//fmt.Println(documentData)
 
 	//Esta parte puede ser omitida cuando se tenga la parte de analisis de los datos
 	error = ioutil.WriteFile("TemporalData", documentData, 0644)

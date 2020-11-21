@@ -2,11 +2,14 @@ package routers
 
 import (
 	"encoding/json"
+	"image/jpeg"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/nfnt/resize"
 
 	database "github.com/CJN-Team/examanager-server/database/usersqueries"
 	"github.com/CJN-Team/examanager-server/models"
@@ -42,8 +45,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-	_, status, error := database.AddUser(t, IDUser,InstitutionID)
+	_, status, error := database.AddUser(t, IDUser, InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
@@ -68,7 +70,7 @@ func ReadUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, error := database.GetUserByIDOneInstitution(ID,InstitutionID)
+	user, error := database.GetUserByIDOneInstitution(ID, InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
@@ -105,7 +107,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Debes estar logueado", http.StatusBadRequest)
 		return
 	}
-	status, error := database.UpdateUser(user, id, IDUser,InstitutionID)
+	status, error := database.UpdateUser(user, id, IDUser, InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar modificar el registro"+error.Error(), 400)
@@ -167,7 +169,7 @@ func DeleteUserRouter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	error := database.DeleteUser(ID, IDUser,InstitutionID)
+	error := database.DeleteUser(ID, IDUser, InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar borrar un usuario"+error.Error(), http.StatusBadRequest)
@@ -196,7 +198,7 @@ func CreateUsersAutomatic(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, error = database.AutomaticCreationUsers(link.DocumentLink, IDUser, link.UserProfile,InstitutionID)
+	_, error = database.AutomaticCreationUsers(link.DocumentLink, IDUser, link.UserProfile, InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Error en la lectura de los datos:  "+error.Error(), 400)
@@ -239,9 +241,31 @@ func UploadUserImage(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	var status bool
 
-	user.Photo = ID + "." + imageExtencion
+	file, error = os.Open(fileRoute)
 
-	status, error = database.UpdateUser(user, ID, IDUser,InstitutionID)
+	if error != nil {
+		http.Error(w, "Error al abrir para editar la imagen:  "+error.Error(), 400)
+		return
+	}
+
+	img, error := jpeg.Decode(file)
+
+	if error != nil {
+		http.Error(w, "Error al decodificar la imagen:  "+error.Error(), 400)
+		return
+	}
+
+	file.Close()
+
+	auxValue := resize.Resize(250, 250, img, resize.Lanczos3)
+
+	out, error := os.Create(fileRoute)
+
+	defer out.Close()
+
+	jpeg.Encode(out, auxValue, nil)
+
+	status, error = database.UpdateUser(user, ID, IDUser, InstitutionID)
 
 	if error != nil || !status {
 		http.Error(w, "Error al guardar la ruta en la base de datos:  "+error.Error(), 400)

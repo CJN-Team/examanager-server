@@ -3,7 +3,6 @@ package groupqueries
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"time"
 
@@ -111,7 +110,6 @@ func WatchedTopics(ID string, institution string) (map[string]bool, error) {
 	subject, found := institutionInfo.Subjetcs[groupModel.Subject]
 
 	for _, value := range subject.(primitive.A) {
-		fmt.Println(value)
 		result[value.(string)] = false
 	}
 	for _, value := range examsmodels {
