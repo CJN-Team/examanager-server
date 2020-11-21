@@ -2,7 +2,9 @@ package routers
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	//"strconv"
@@ -290,4 +292,47 @@ func GetGenerateExam(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 
 	json.NewEncoder(w).Encode(result)
+}
+
+//GeneratePDF genera los pdf
+func GeneratePDF(w http.ResponseWriter, r *http.Request) {
+	ID := r.URL.Query().Get("id")
+
+	if len(ID) < 1 {
+		http.Error(w, "Falta el parametro ID", http.StatusBadRequest)
+		return
+	}
+	exam, _, _ := database.GetExamByID(ID, InstitutionID)
+
+	generateExam.CreatePDF(exam, InstitutionID)
+
+	CleanToken()
+	w.WriteHeader(http.StatusAccepted)
+}
+
+//DownloadPDF descarga el pdf
+func DownloadPDF(w http.ResponseWriter, r *http.Request) {
+
+	ID := r.URL.Query().Get("id")
+
+	if len(ID) < 1 {
+		http.Error(w, "Debe enviar el parametro ID", http.StatusBadRequest)
+		return
+	}
+
+	file, error := os.Open("exam-pdf/" + ID + ".pdf")
+
+	if error != nil {
+		http.Error(w, "Error al abrir el examen  "+error.Error(), 400)
+		return
+	}
+
+	_, error = io.Copy(w, file)
+
+	if error != nil {
+		http.Error(w, "Error al copiar el examen "+error.Error(), 400)
+		return
+	}
+
+	CleanToken()
 }

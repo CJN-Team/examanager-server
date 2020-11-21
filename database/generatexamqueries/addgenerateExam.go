@@ -46,7 +46,9 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 		generateExam.MockExam = examModel.MockExam
 		generateExam.View = examModel.View
 		generateExam.State = examModel.State
-		generateExam.Teacher = group.Teacher
+		generateExam.TeacherID = group.Teacher
+		teacher, _ := userDB.GetUserByID(group.Teacher)
+		generateExam.Teacher = teacher.Name + " " + teacher.LastName
 		student, _ := userDB.GetUserByID(key)
 		generateExam.Student = student.Name + " " + student.LastName
 		generateExam.StudentID = student.ID
@@ -82,6 +84,9 @@ func GenerateMockExam(examModel models.Exam, loggedUser string, institution stri
 	generateExam.View = examModel.View
 	generateExam.State = examModel.State
 	generateExam.Teacher = group.Teacher
+	generateExam.TeacherID = group.Teacher
+	teacher, _ := userDB.GetUserByID(group.Teacher)
+	generateExam.Teacher = teacher.Name + " " + teacher.LastName
 	generateExam.Student = user.Name + " " + user.LastName
 	generateExam.StudentID = user.ID
 	generateExam.Date = examModel.Date

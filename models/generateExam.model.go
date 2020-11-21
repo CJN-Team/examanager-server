@@ -13,6 +13,7 @@ type GenerateExam struct {
 	State           bool               `bson:"state,omitempty" json:"state,omitempty"`
 	MockExam        bool               `bson:"mockExam,omitempty" json:"mockExam,omitempty"`
 	Finish          bool               `bson:"finish,omitempty" json:"finish,omitempty"`
+	TeacherID       string             `bson:"teacherid,omitempty" json:"teacherid,omitempty"`
 	Teacher         string             `bson:"teacher,omitempty" json:"teacher,omitempty"`
 	Student         string             `bson:"student,omitempty" json:"student,omitempty"`
 	StudentID       string             `bson:"studentid,omitempty" json:"studentid,omitempty"`
