@@ -183,6 +183,11 @@ func DeleteExam(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error al eliminar el examen: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
+		err = grupDB.DeleteExamsOfStudents(examModel.GroupID, generatedExamID, InstitutionID)
+		if err != nil {
+			http.Error(w, "Error al eliminar el examen de los estudiantes: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	CleanToken()
