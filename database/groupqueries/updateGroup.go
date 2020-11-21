@@ -12,7 +12,7 @@ import (
 )
 
 //UpdateGroup se encarga de actualizar el usuario registrado
-func UpdateGroup(group models.Group, ID string, loggedUser string) (bool, error) {
+func UpdateGroup(group models.Group, ID string, loggedUser string, loggedInstitution string) (bool, error) {
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -38,12 +38,12 @@ func UpdateGroup(group models.Group, ID string, loggedUser string) (bool, error)
 		"$set": groupRegisterd,
 	}
 
-	if userTypeVerificationdeleting(loggedUser) {
+	if userTypeVerificationdeleting(loggedUser, loggedInstitution) {
 		error := errors.New("el usuario no posee los permisos suficientes")
 		return false, error
 	}
 
-	filter := bson.M{"_id": bson.M{"$eq": ID}}
+	filter := bson.M{"_id": bson.M{"$eq": ID}, "institution":bson.M{"$eq": loggedInstitution}}
 
 	_, error := coleccion.UpdateOne(contex, filter, updateString)
 
@@ -54,9 +54,9 @@ func UpdateGroup(group models.Group, ID string, loggedUser string) (bool, error)
 	return true, nil
 }
 
-func userTypeVerificationUpdating(loggedUser string) bool {
+func userTypeVerificationUpdating(loggedUser string, loggedInstitution string) bool {
 
-	userID, _ := usersqueries.GetUserByID(loggedUser)
+	userID, _ := usersqueries.GetUserByIDOneInstitution(loggedUser, loggedInstitution)
 
 	if userID.Profile != "Administrador" {
 		return true

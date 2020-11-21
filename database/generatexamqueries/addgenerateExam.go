@@ -47,7 +47,7 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 		generateExam.View = examModel.View
 		generateExam.State = examModel.State
 		generateExam.Teacher = group.Teacher
-		student, _ := userDB.GetUserByID(key)
+		student, _ := userDB.GetUserByIDOneInstitution(key, institution)
 		generateExam.Student = student.Name + " " + student.LastName
 		generateExam.StudentID = student.ID
 		generateExam.Date = examModel.Date
@@ -65,14 +65,14 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 
 		ids = append(ids, id)
 	}
-	grupDB.UpdateGroup(group, group.ID, loggedUser)
+	grupDB.UpdateGroup(group, group.ID, loggedUser, institution)
 	return ids, true, nil
 }
 
 //GenerateMockExam genera los examenes de prueba
 func GenerateMockExam(examModel models.Exam, loggedUser string, institution string) (string, bool, error) {
 	var generateExam models.GenerateExam
-	user, err := userDB.GetUserByID(loggedUser)
+	user, err := userDB.GetUserByIDOneInstitution(loggedUser, institution)
 	group, err := grupDB.GetGroupByID(examModel.GroupID, institution)
 
 	if err != nil {

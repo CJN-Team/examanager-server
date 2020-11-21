@@ -42,14 +42,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, found, _ := database.GetUserByEmail(t.Email)
 
-	if found {
-		http.Error(w, "El usuario ya existe", 400)
-		return
-	}
-
-	_, status, error := database.AddUser(t, IDUser)
+	_, status, error := database.AddUser(t, IDUser,InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
@@ -74,7 +68,7 @@ func ReadUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, error := database.GetUserByID(ID)
+	user, error := database.GetUserByIDOneInstitution(ID,InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al buscar el registro"+error.Error(), 400)
@@ -111,7 +105,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Debes estar logueado", http.StatusBadRequest)
 		return
 	}
-	status, error := database.UpdateUser(user, id, IDUser)
+	status, error := database.UpdateUser(user, id, IDUser,InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar modificar el registro"+error.Error(), 400)
@@ -173,7 +167,7 @@ func DeleteUserRouter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	error := database.DeleteUser(ID, IDUser)
+	error := database.DeleteUser(ID, IDUser,InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar borrar un usuario"+error.Error(), http.StatusBadRequest)
@@ -202,7 +196,7 @@ func CreateUsersAutomatic(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, error = database.AutomaticCreationUsers(link.DocumentLink, IDUser, link.UserProfile)
+	_, error = database.AutomaticCreationUsers(link.DocumentLink, IDUser, link.UserProfile,InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Error en la lectura de los datos:  "+error.Error(), 400)
@@ -247,7 +241,7 @@ func UploadUserImage(w http.ResponseWriter, r *http.Request) {
 
 	user.Photo = ID + "." + imageExtencion
 
-	status, error = database.UpdateUser(user, ID, IDUser)
+	status, error = database.UpdateUser(user, ID, IDUser,InstitutionID)
 
 	if error != nil || !status {
 		http.Error(w, "Error al guardar la ruta en la base de datos:  "+error.Error(), 400)
@@ -266,7 +260,7 @@ func ReadUserImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	profile, error := database.GetUserByID(ID)
+	profile, error := database.GetUserByIDAllInstitutions(ID)
 
 	if error != nil {
 		http.Error(w, "Usuario no encontrado:  "+error.Error(), 400)

@@ -15,7 +15,7 @@ import (
 )
 
 //AutomaticCreationUsers Se encarga de crear por medio de una hoja de google sheets los usuarios de manera automatic
-func AutomaticCreationUsers(link string, loggedUser string, profile string) (bool, error) {
+func AutomaticCreationUsers(link string, loggedUser string, profile string, loggedInstitution string) (bool, error) {
 
 	response, error := getDocument(link)
 
@@ -23,7 +23,7 @@ func AutomaticCreationUsers(link string, loggedUser string, profile string) (boo
 		return response, error
 	}
 
-	error = readDocument(loggedUser, profile)
+	error = readDocument(loggedUser, profile, loggedInstitution)
 
 	if error != nil {
 		return false, error
@@ -76,7 +76,7 @@ func getDocument(link string) (bool, error) {
 	return true, nil
 }
 
-func readDocument(loggedUser string, profile string) error {
+func readDocument(loggedUser string, profile string, loggedInstitution string) error {
 	dataRaw, error := os.Open("./TemporalData")
 
 	if error != nil {
@@ -104,7 +104,7 @@ func readDocument(loggedUser string, profile string) error {
 				Password: register[5],
 			}
 
-			AddUser(newUser, loggedUser)
+			AddUser(newUser, loggedUser, loggedInstitution)
 		}
 		position++
 	}

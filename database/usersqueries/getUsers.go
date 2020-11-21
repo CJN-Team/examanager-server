@@ -77,8 +77,8 @@ func GetUserByEmail(email string) (models.User, bool, string) {
 	return result, true, ID
 }
 
-//GetUserByID se encarga de buscar en la base de datos el usuario que posee la ID asignada
-func GetUserByID(ID string) (models.User, error) {
+//GetUserByIDAllInstitutions se encarga de buscar en la base de datos el usuario que posee la ID asignada
+func GetUserByIDAllInstitutions(ID string) (models.User, error) {
 
 	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -92,6 +92,33 @@ func GetUserByID(ID string) (models.User, error) {
 	ObjectID := ID
 
 	condicion := bson.M{"_id": ObjectID}
+
+	error := coleccion.FindOne(contex, condicion).Decode(&result)
+
+	result.Password = ""
+
+	if error != nil {
+		return result, error
+	}
+
+	return result, nil
+}
+
+//GetUserByIDOneInstitution se encarga de buscar en la base de datos el usuario que posee la ID asignada en una sola institucion
+func GetUserByIDOneInstitution(ID string, institution string) (models.User, error) {
+
+	contex, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	database := dbConnection.MongoConexion.Database("examanager_db")
+
+	coleccion := database.Collection("users")
+
+	var result models.User
+
+	ObjectID := ID
+
+	condicion := bson.M{"_id": ObjectID, "institution":institution}
 
 	error := coleccion.FindOne(contex, condicion).Decode(&result)
 

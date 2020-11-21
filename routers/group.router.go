@@ -184,7 +184,7 @@ func DeleteGroup(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(ID, IDUser)
 
-	error := database.DeleteGroup(ID, IDUser)
+	error := database.DeleteGroup(ID, IDUser,InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar borrar un grupo"+error.Error(), http.StatusBadRequest)
@@ -218,7 +218,7 @@ func UpdateGroup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Debes estar logueado", http.StatusBadRequest)
 		return
 	}
-	status, error := database.UpdateGroup(group, id, IDUser)
+	status, error := database.UpdateGroup(group, id, IDUser,InstitutionID)
 
 	if error != nil {
 		http.Error(w, "Ocurrio un error al intentar modificar el registro"+error.Error(), 400)
