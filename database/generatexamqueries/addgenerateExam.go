@@ -37,6 +37,7 @@ func AddGenerateExam(generateExamModel models.GenerateExam) (string, bool, error
 func GenerateExam(examModel models.Exam, loggedUser string, institution string) ([]string, bool, error) {
 	var generateExam models.GenerateExam
 	var ids []string
+	var verificar = true
 	group, err := grupDB.GetGroupByID(examModel.GroupID, institution)
 
 	if err != nil {
@@ -59,13 +60,21 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 		generateExam.InstitutionName = institution.Name
 		generateExam.Photo = student.Photo
 		generateExam.Name = examModel.Name
-		generateExam.Questions, _, _ = GetQuestions(examModel, student.Institution)
+		generateExam.Questions, verificar, _ = GetQuestions(examModel, student.Institution)
+
+		if !verificar {
+			break
+		}
 
 		id, _, _ := AddGenerateExam(generateExam)
 
 		group.StudentsList[key] = append(value.(primitive.A), id)
 
 		ids = append(ids, id)
+	}
+	if !verificar {
+		ids = append(ids, "1")
+		return ids, false, nil
 	}
 	grupDB.UpdateGroup(group, group.ID, loggedUser, institution)
 	return ids, true, nil
@@ -74,6 +83,7 @@ func GenerateExam(examModel models.Exam, loggedUser string, institution string) 
 //GenerateMockExam genera los examenes de prueba
 func GenerateMockExam(examModel models.Exam, loggedUser string, institution string) (string, bool, error) {
 	var generateExam models.GenerateExam
+	var verificar = true
 	user, err := userDB.GetUserByIDOneInstitution(loggedUser, institution)
 	group, err := grupDB.GetGroupByID(examModel.GroupID, institution)
 
@@ -96,7 +106,11 @@ func GenerateMockExam(examModel models.Exam, loggedUser string, institution stri
 	generateExam.InstitutionName = institutionmodel.Name
 	generateExam.Photo = user.Photo
 	generateExam.Name = examModel.Name
-	generateExam.Questions, _, _ = GetQuestions(examModel, institution)
+	generateExam.Questions, verificar, _ = GetQuestions(examModel, institution)
+
+	if !verificar {
+		return "", false, nil
+	}
 
 	id, _, _ := AddGenerateExam(generateExam)
 	return id, true, nil
@@ -109,30 +123,36 @@ func GetQuestions(examModel models.Exam, institution string) (map[string][]inter
 	questionsFacil, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "1", 3, -1, institution)
 	questionsNormal, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "2", 3, -1, institution)
 	questionsDificil, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "3", 3, -1, institution)
+
+	if len(questionsFacil) == 0 || len(questionsNormal) == 0 || len(questionsDificil) == 0 {
+		questions["1"] = []interface{}{0.0, ""}
+		return questions, false, nil
+	}
+
 	facil := examModel.Difficulty[0]
 	normal := examModel.Difficulty[1]
 	dificil := examModel.Difficulty[2]
 	i := 0
 	for i < facil {
-		random = rand.Intn(len(questionsFacil) - 1)
+		random = rand.Intn(len(questionsFacil))
 		if _, exist := questions[questionsFacil[random].ID]; !exist {
-			questions[questionsFacil[random].ID] = []interface{}{0.0,""}
+			questions[questionsFacil[random].ID] = []interface{}{0.0, ""}
 			i++
 		}
 	}
 	i = 0
 	for i < normal {
-		random = rand.Intn(len(questionsNormal) - 1)
+		random = rand.Intn(len(questionsNormal))
 		if _, exist := questions[questionsNormal[random].ID]; !exist {
-			questions[questionsNormal[random].ID] =[]interface{}{0.0,""}
+			questions[questionsNormal[random].ID] = []interface{}{0.0, ""}
 			i++
 		}
 	}
 	i = 0
 	for i < dificil {
-		random = rand.Intn(len(questionsDificil) - 1)
+		random = rand.Intn(len(questionsDificil))
 		if _, exist := questions[questionsDificil[random].ID]; !exist {
-			questions[questionsDificil[random].ID] = []interface{}{0.0,""}
+			questions[questionsDificil[random].ID] = []interface{}{0.0, ""}
 			i++
 		}
 	}

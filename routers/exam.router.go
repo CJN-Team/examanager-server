@@ -116,32 +116,43 @@ func CreateGenerateExam(w http.ResponseWriter, r *http.Request) {
 		}
 
 		ids, status, error := generateExam.GenerateExam(exam, IDUser, InstitutionID)
+		if status == false {
+			database.DeleteExam(ID)
+			http.Error(w, "No hay suficientes preguntas para generar el examen" ,400)
+			return
+		}
+
+		if error != nil {
+			http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
+			return
+		}
 
 		exam.GenerateExam = ids
-		if error != nil {
-			http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
-			return
-		}
-
+		status, error = database.UpdateExam(exam, ID, InstitutionID)
 		if status == false {
 			http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
 			return
 		}
-		status, error = database.UpdateExam(exam, ID, InstitutionID)
 	} else {
+
 		id, status, error := generateExam.GenerateMockExam(exam, IDUser, InstitutionID)
+		if status == false {
+			http.Error(w, "No hay suficientes preguntas para generar el examen" ,400)
+			return
+		}
+
+		if error != nil {
+			http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
+			return
+		}
 
 		exam.GenerateExam = append(exam.GenerateExam, id)
-		if error != nil {
-			http.Error(w, "Error al intentar añadir un registro"+error.Error(), 400)
-			return
-		}
 
+		status, error = database.UpdateExam(exam, ID, InstitutionID)
 		if status == false {
 			http.Error(w, "No se logro añadir un registro"+error.Error(), 400)
 			return
 		}
-		status, error = database.UpdateExam(exam, ID, InstitutionID)
 	}
 
 	CleanToken()
