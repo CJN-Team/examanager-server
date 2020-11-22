@@ -546,11 +546,10 @@ func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[s
 	quantity := 0
 
 	examQuestions := generatedExam.Questions
-
+	idinst := InstitutionID
 	for key := range examQuestions {
 		quantity++
-
-		question, _, err := questionsDB.GetQuestionByID(key, InstitutionID)
+		question, _, err := questionsDB.GetQuestionByID(key, idinst)
 		if err != nil {
 			http.Error(w, "Error al encontrar la pregunta "+err.Error(), http.StatusInternalServerError)
 			return
@@ -560,7 +559,6 @@ func GradeOpenQuestion(w http.ResponseWriter, r *http.Request, requestBody map[s
 		teacherGrade, found := teacherGrades[key].(float64)
 
 		if question.Category == "Pregunta abierta" {
-
 
 			if !found {
 				continue
