@@ -38,12 +38,12 @@ func UpdateGroup(group models.Group, ID string, loggedUser string, loggedInstitu
 		"$set": groupRegisterd,
 	}
 
-	if userTypeVerificationdeleting(loggedUser, loggedInstitution) {
+	if userTypeVerificationUpdating(loggedUser, loggedInstitution) {
 		error := errors.New("el usuario no posee los permisos suficientes")
 		return false, error
 	}
 
-	filter := bson.M{"_id": bson.M{"$eq": ID}, "institution":bson.M{"$eq": loggedInstitution}}
+	filter := bson.M{"_id": bson.M{"$eq": ID}, "institution": bson.M{"$eq": loggedInstitution}}
 
 	_, error := coleccion.UpdateOne(contex, filter, updateString)
 
@@ -57,7 +57,6 @@ func UpdateGroup(group models.Group, ID string, loggedUser string, loggedInstitu
 func userTypeVerificationUpdating(loggedUser string, loggedInstitution string) bool {
 
 	userID, _ := usersqueries.GetUserByIDOneInstitution(loggedUser, loggedInstitution)
-
 	if userID.Profile == "Estudiante" {
 		return true
 	}
