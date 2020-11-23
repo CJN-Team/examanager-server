@@ -124,14 +124,15 @@ func GetQuestions(examModel models.Exam, institution string) (map[string][]inter
 	questionsNormal, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "2", 3, -1, institution)
 	questionsDificil, _ := questionsDB.GetAllQuestions(examModel.TopicQuestion, "3", 3, -1, institution)
 
-	if len(questionsFacil) == 0 || len(questionsNormal) == 0 || len(questionsDificil) == 0 {
+	facil := examModel.Difficulty[0]
+	normal := examModel.Difficulty[1]
+	dificil := examModel.Difficulty[2]
+
+	if len(questionsFacil) < facil || len(questionsNormal) < normal || len(questionsDificil) < dificil {
 		questions["1"] = []interface{}{0.0, ""}
 		return questions, false, nil
 	}
 
-	facil := examModel.Difficulty[0]
-	normal := examModel.Difficulty[1]
-	dificil := examModel.Difficulty[2]
 	i := 0
 	for i < facil {
 		random = rand.Intn(len(questionsFacil))
